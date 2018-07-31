@@ -29,7 +29,7 @@ var TokenSubType;
 })(TokenSubType = exports.TokenSubType || (exports.TokenSubType = {}));
 // 子令牌类型值
 exports.TokenSubTypeExpReg = {
-    FUNCTION: /^[A-Z_]+\(/,
+    FUNCTION: /^[A-Z_]+(\()/,
     LOGICAL: /^(<|>|=|>=|<=)/,
     MATH: /^[+\-*/]/,
     NUMBER: /^([1-9][0-9]*|[0-9])(|\.[0-9]*[1-9])/,
