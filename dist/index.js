@@ -15,7 +15,7 @@ var token_1 = require("./lib/token");
  */
 var FuncFormulaParser = /** @class */ (function () {
     function FuncFormulaParser(customOpt) {
-        this.option = __assign({ customFunc: {} }, customOpt);
+        this.option = __assign({ autoParseNode: false, customFunc: {} }, customOpt);
     }
     /**
      * 创建令牌词法分析结果
@@ -23,10 +23,11 @@ var FuncFormulaParser = /** @class */ (function () {
      * @return {ITokenItem[]}         令牌流
      */
     FuncFormulaParser.prototype.setFormula = function (formula) {
-        if (formula === this.sourceFormula) {
+        var curFormula = formula.replace(/[\n\s]/g, '');
+        if (curFormula === this.sourceFormula) {
             return this.tokenArr;
         }
-        this.sourceFormula = formula;
+        this.sourceFormula = curFormula;
         this.tokenArr = token_1.parseToken(formula);
         return this.tokenArr;
     };

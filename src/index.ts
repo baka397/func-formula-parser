@@ -12,6 +12,7 @@ class FuncFormulaParser {
     private sourceFormula: string; // 原始公式
     constructor(customOpt?: IFormulaOption) {
         this.option = {
+            autoParseNode: false,
             customFunc: {},
             ...customOpt
         };
@@ -22,10 +23,11 @@ class FuncFormulaParser {
      * @return {ITokenItem[]}         令牌流
      */
     public setFormula(formula: string): ITokenItem[] {
-        if (formula === this.sourceFormula) {
+        const curFormula = formula.replace(/[\n\s]/g, '');
+        if (curFormula === this.sourceFormula) {
             return this.tokenArr;
         }
-        this.sourceFormula = formula;
+        this.sourceFormula = curFormula;
         this.tokenArr = parseToken(formula);
         return this.tokenArr;
     }

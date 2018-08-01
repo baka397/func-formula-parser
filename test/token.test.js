@@ -42,9 +42,9 @@ describe('Token', function() {
                 },
                 {
                     parentType: null,
-                    type: TOKEN.TokenType.TYPE_OP_IN,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
                     subType: TOKEN.TokenSubType.SUBTYPE_MATH,
-                    token: '+',
+                    token: '1',
                     row: 1,
                     start: 2,
                     end: 3
@@ -81,6 +81,72 @@ describe('Token', function() {
                     row: 1,
                     start: 2,
                     end: 3
+                }
+            ];
+            validTokenReulst(tokenList, assertResult);
+        });
+        it('1+1.2', function() {
+            const tokenList = formulaParser.setFormula('1+1.2');
+            const assertResult = [
+                {
+                    parentType: null,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
+                    subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                    token: '1',
+                    row: 1,
+                    start: 0,
+                    end: 1
+                },
+                {
+                    parentType: null,
+                    type: TOKEN.TokenType.TYPE_OP_IN,
+                    subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                    token: '+',
+                    row: 1,
+                    start: 1,
+                    end: 2
+                },
+                {
+                    parentType: null,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
+                    subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                    token: '1.2',
+                    row: 1,
+                    start: 2,
+                    end: 5
+                }
+            ];
+            validTokenReulst(tokenList, assertResult);
+        });
+        it('1+1.2e24', function() {
+            const tokenList = formulaParser.setFormula('1+1.2e24');
+            const assertResult = [
+                {
+                    parentType: null,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
+                    subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                    token: '1',
+                    row: 1,
+                    start: 0,
+                    end: 1
+                },
+                {
+                    parentType: null,
+                    type: TOKEN.TokenType.TYPE_OP_IN,
+                    subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                    token: '+',
+                    row: 1,
+                    start: 1,
+                    end: 2
+                },
+                {
+                    parentType: null,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
+                    subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                    token: '1.2',
+                    row: 1,
+                    start: 2,
+                    end: 5
                 }
             ];
             validTokenReulst(tokenList, assertResult);

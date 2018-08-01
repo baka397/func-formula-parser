@@ -32,7 +32,7 @@ exports.TokenSubTypeExpReg = {
     FUNCTION: /^([A-Z_]+)\(/,
     LOGICAL: /^(>=|<=|<|>|=)/,
     MATH: /^[+\-*/]/,
-    NUMBER: /^([1-9][0-9]*|[0-9])(|\.[0-9]*[1-9])/,
+    NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(E[1-9][0-9]*|)/,
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
     VARIABLE: /^[A-Z_\u4e00-\u9fa5]+/
