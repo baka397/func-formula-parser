@@ -6,10 +6,10 @@ const complexSuite = new Benchmark.Suite('complex');
 
 const chalk = require('chalk');
 
-const FuncFormulaParser = require('../../dist/');
+const FuncFormulaParser = require('../../dist/').default;
 const excelFormulaP = require('../third_lib/excel_formula_p');
 const simpleFormula = '1+1';
-const complexFormula = 'IF(1>0,COUNT(3,4,5),5%)';
+const complexFormula = 'IF(测试>=0,COUNT(ROUND(a/5),4,5),5%)';
 
 console.log(chalk.bgYellow('Start benchmark'));
 

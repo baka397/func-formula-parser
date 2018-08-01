@@ -1,3 +1,3 @@
 export interface IFormulaOption {
-    autoSyntacticAnalysis?: boolean; // 自动词法解析
+    customFunc?: object; // 自定义函数
 }

@@ -15,14 +15,23 @@ export function parseToken(formula: string): ITokenItem[] {
         type: TokenType.TYPE_START
     };
     let curTokenArray: ITokenItem[] = []; // 令牌字符串
+    const curParentTokenTypeList: TokenType[] = []; // 当前父级令牌类型列表
     formulaList.forEach((curFormula, index) => {
-        curTokenArray = curTokenArray.concat(parseLineToken(curFormula, index + 1, curTokenItem));
+        curTokenArray = curTokenArray.concat(parseLineToken(curFormula, index + 1, curTokenItem, curParentTokenTypeList));
         const lastTokenItem = curTokenArray[curTokenArray.length - 1];
         // 处理节点空值的情况,返回数据
         if (lastTokenItem) {
             curTokenItem = lastTokenItem;
         }
     });
+    // 检查是否没有闭合
+    if (curParentTokenTypeList.length > 0) {
+        throwSyntaxError(formulaList.length + 1, 0, '', `Need closure`);
+    }
+    // 检查最后一个类型是否为闭合期望
+    if (!isClosedToken(curTokenItem)) {
+        throwSyntaxError(formulaList.length + 1, 0, '', `Illegal end symbol`);
+    }
     return curTokenArray;
 }
 
@@ -32,11 +41,9 @@ function throwSyntaxError(line: number, col: number, formulaStr: string, desc: s
 }
 
 // 单行解析令牌
-function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem): ITokenItem[] {
+function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem, lastParentTokenTypeList: TokenType[]): ITokenItem[] {
     const curLineTokenList: ITokenItem[] = []; // 当前数据
-    const curLastTokenType: TokenType = getParentTokenTypeName(lastTokenItem.type, lastTokenItem.subType, curLineTokenList);
-    // 当前令牌父类列表, 查看上级令牌类型是否为父类型,是的话,默认添加到父类型
-    const parentTokenTypeList: TokenType[] = curLastTokenType ? [curLastTokenType] : [];
+    const curLastTokenType: TokenType = lastParentTokenTypeList[0] || null;
     // 大写并去除公式空格
     let formulaStr: string = formula.toUpperCase().replace(/\s/g, '');
     let curTokenItem: ITokenItem = lastTokenItem; // 当前令牌
@@ -54,32 +61,30 @@ function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem
                 return `${item[0]}${item[1] ? ':' + item[1] : ''}`;
             }).join(',')}`);
         }
-        tokenItem.parentType = parentTokenTypeList[0] || null;
-        const curParentTokenType = getParentTokenTypeName(tokenItem.type, tokenItem.subType, curLineTokenList);
-        // 如果有父级类型插入
-        if (curParentTokenType) {
-            parentTokenTypeList.unshift(curParentTokenType);
-        }
-        const isNeedRollback = isNeedRollbackParentToken(tokenItem);
-        if (isNeedRollback) {
-            if (parentTokenTypeList.length === 0) {
-                throwSyntaxError(line, curStart, formulaStr, `Extra closure`);
-            }
-            parentTokenTypeList.shift();
-        }
+        // 更新数据
+        // 更新坐标
         tokenItem.loc = {
             end: curStart + tokenItem.sourceToken.length,
             row: line,
             start: curStart
         };
-        // 更新数据
+        // 检测是否需要回滚到上级父令牌
+        const isNeedRollback = isNeedRollbackParentToken(tokenItem);
+        if (isNeedRollback) {
+            lastParentTokenTypeList.shift();
+        }
+        // 插入当前令牌
+        tokenItem.parentType = lastParentTokenTypeList[0] || null;
+        // 检测是否需要插入一个新的上级令牌
+        const curParentTokenType = getParentTokenTypeName(tokenItem, curLineTokenList);
+        // 如果有父级类型插入
+        if (curParentTokenType) {
+            lastParentTokenTypeList.unshift(curParentTokenType);
+        }
         curLineTokenList.push(tokenItem);
         curTokenItem = tokenItem;
         curStart = tokenItem.loc.end;
         formulaStr = formulaStr.substring(tokenItem.sourceToken.length);
-    }
-    if (parentTokenTypeList.length > 0) {
-        throwSyntaxError(line, curStart, formulaStr, `Need closure`);
     }
     return curLineTokenList;
 }
@@ -89,21 +94,28 @@ function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem
  * @param  {string}     formula 公式
  * @return {ITokenItem}         令牌对象
  */
-function parseType(formula: string, curTokenItem: ITokenItem): {
+function parseType(formula: string, prevTokenItem: ITokenItem): {
     expectType: Array<[TokenType, TokenSubType]>,
     item: ITokenItem
 } {
     let curTypeList: Array<[TokenType, TokenSubType]> = []; // [当前令牌类型, 预期的令牌子类型?]
-    const curParentType: TokenType = curTokenItem.parentType;
-    const curSubType: TokenSubType = curTokenItem.subType;
-    const curType: TokenType = curTokenItem.type;
+    const curParentType: TokenType = prevTokenItem.parentType;
+    const curSubType: TokenSubType = prevTokenItem.subType;
+    const curType: TokenType = prevTokenItem.type;
     // 对嵌入型参数插入通用类型
     function insetWrapCommonType() {
         switch (curParentType) {
             case null: // 不存在父级时
                 break;
-            case TokenType.TYPE_FUNCTION: // 如果父类型是函数时,可以插入参数符
+            // 如果父类型是函数或者集合时
+            case TokenType.TYPE_FUNCTION:
                 curTypeList.push([TokenType.TYPE_ARGUMENT, null]);
+                curTypeList.push([TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_STOP]);
+                break;
+            case TokenType.TYPE_SET:
+                curTypeList.push([TokenType.TYPE_ARGUMENT, null]);
+                curTypeList.push([TokenType.TYPE_SET, TokenSubType.SUBTYPE_STOP]);
+                break;
             default: // 如果父类型存在,则可以插入结束符
                 curTypeList.push([TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_STOP]);
                 break;
@@ -113,10 +125,10 @@ function parseType(formula: string, curTokenItem: ITokenItem): {
         case TokenType.TYPE_START:
             curTypeList = [
                 [TokenType.TYPE_OPERAND, null],
-                [TokenType.TYPE_FUNCTION, null],
-                [TokenType.TYPE_VARIABLE, null],
                 [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
-                [TokenType.TYPE_OP_PRE, null]
+                [TokenType.TYPE_OP_PRE, null],
+                [TokenType.TYPE_FUNCTION, null],
+                [TokenType.TYPE_VARIABLE, null]
             ];
             break;
         case TokenType.TYPE_OPERAND:
@@ -132,10 +144,10 @@ function parseType(formula: string, curTokenItem: ITokenItem): {
                 case TokenSubType.SUBTYPE_START:
                     curTypeList = [
                         [TokenType.TYPE_OPERAND, null],
-                        [TokenType.TYPE_FUNCTION, null], // 子函数
-                        [TokenType.TYPE_VARIABLE, null],
                         [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START], // 子表达式
-                        [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START] // 集合起始
+                        [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START], // 集合起始
+                        [TokenType.TYPE_FUNCTION, null], // 子函数
+                        [TokenType.TYPE_VARIABLE, null]
                     ];
                     break;
                 case TokenSubType.SUBTYPE_STOP:
@@ -151,10 +163,10 @@ function parseType(formula: string, curTokenItem: ITokenItem): {
                 case TokenSubType.SUBTYPE_START:
                     curTypeList = [
                         [TokenType.TYPE_OPERAND, null],
-                        [TokenType.TYPE_FUNCTION, null],
-                        [TokenType.TYPE_VARIABLE, null],
                         [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
-                        [TokenType.TYPE_OP_PRE, null]
+                        [TokenType.TYPE_OP_PRE, null],
+                        [TokenType.TYPE_FUNCTION, null],
+                        [TokenType.TYPE_VARIABLE, null]
                     ];
                     break;
                 case TokenSubType.SUBTYPE_STOP:
@@ -168,17 +180,17 @@ function parseType(formula: string, curTokenItem: ITokenItem): {
         case TokenType.TYPE_OP_PRE:
             curTypeList = [
                 [TokenType.TYPE_OPERAND, null],
+                [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
                 [TokenType.TYPE_FUNCTION, null],
-                [TokenType.TYPE_VARIABLE, null],
-                [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START]
+                [TokenType.TYPE_VARIABLE, null]
             ];
             break;
         case TokenType.TYPE_OP_IN:
             curTypeList = [
                 [TokenType.TYPE_OPERAND, null],
+                [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
                 [TokenType.TYPE_FUNCTION, null],
-                [TokenType.TYPE_VARIABLE, null],
-                [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START]
+                [TokenType.TYPE_VARIABLE, null]
             ];
             break;
         case TokenType.TYPE_OP_POST:
@@ -190,10 +202,11 @@ function parseType(formula: string, curTokenItem: ITokenItem): {
         case TokenType.TYPE_ARGUMENT:
             curTypeList = [
                 [TokenType.TYPE_OPERAND, null],
-                [TokenType.TYPE_FUNCTION, null],
-                [TokenType.TYPE_VARIABLE, null],
+                [TokenType.TYPE_OP_PRE, null],
                 [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
-                [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START]
+                [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START],
+                [TokenType.TYPE_FUNCTION, null],
+                [TokenType.TYPE_VARIABLE, null]
             ];
             break;
         case TokenType.TYPE_SET:
@@ -201,10 +214,10 @@ function parseType(formula: string, curTokenItem: ITokenItem): {
                 case TokenSubType.SUBTYPE_START:
                     curTypeList = [
                         [TokenType.TYPE_OPERAND, null],
-                        [TokenType.TYPE_FUNCTION, null],
-                        [TokenType.TYPE_VARIABLE, null],
                         [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
-                        [TokenType.TYPE_OP_PRE, null]
+                        [TokenType.TYPE_OP_PRE, null],
+                        [TokenType.TYPE_FUNCTION, null],
+                        [TokenType.TYPE_VARIABLE, null]
                     ];
                     break;
                 case TokenSubType.SUBTYPE_STOP:
@@ -234,7 +247,7 @@ function parseFormulaStr(formula: string, typeList: Array<[TokenType, TokenSubTy
     let tokenItem: ITokenItem;
     const result = typeList.some((type) => {
         const curType: TokenType = type[0];
-        const curSubType: TokenSubType = type[1];
+        const curExpectSubType: TokenSubType = type[1];
         switch (curType) {
             case TokenType.TYPE_OPERAND: // 操作对象
                 tokenItem = NumberTokenMatch(formula, curType);
@@ -243,7 +256,7 @@ function parseFormulaStr(formula: string, typeList: Array<[TokenType, TokenSubTy
                 tokenItem = functionTokenMatch(formula, curType);
                 break;
             case TokenType.TYPE_SUBEXPR: // 子表达式
-                tokenItem = subexpressionTokenMatch(formula, curType, curSubType);
+                tokenItem = subexpressionTokenMatch(formula, curType, curExpectSubType);
                 break;
             case TokenType.TYPE_OP_PRE: // 前置操作符
                 tokenItem = mathTokenMatch(formula, curType);
@@ -261,7 +274,7 @@ function parseFormulaStr(formula: string, typeList: Array<[TokenType, TokenSubTy
                 tokenItem = argumentTokenMatch(formula, curType);
                 break;
             case TokenType.TYPE_SET: // 集合
-                tokenItem = setTokenMatch(formula, curType, curSubType);
+                tokenItem = setTokenMatch(formula, curType, curExpectSubType);
                 break;
             case TokenType.TYPE_VARIABLE: // 变量
                 tokenItem = variableTokenMatch(formula, curType);
@@ -276,33 +289,38 @@ function parseFormulaStr(formula: string, typeList: Array<[TokenType, TokenSubTy
 }
 
 // 获取父级令牌名称
-function getParentTokenTypeName(tokenType: TokenType, tokenSubType: TokenSubType, tokenList: ITokenItem[]): TokenType {
-    switch (tokenType) {
+function getParentTokenTypeName(tokenItem: ITokenItem, tokenList: ITokenItem[]): TokenType {
+    const curTokenType = tokenItem.type;
+    switch (curTokenType) {
         // 以下类型会返回自身为父级令牌
         case TokenType.TYPE_FUNCTION:
         case TokenType.TYPE_SET:
         case TokenType.TYPE_SUBEXPR:
-            if (tokenSubType === TokenSubType.SUBTYPE_STOP) {
+            if (tokenItem.subType === TokenSubType.SUBTYPE_STOP) {
                 return null;
             }
-            return tokenType;
+            return curTokenType;
         default: // 非特殊的留空
             return null;
     }
 }
 
 // 是否需要回滚父级
-function isNeedRollbackParentToken(curTokenItem: ITokenItem): boolean {
-    switch (curTokenItem.type) {
+function isNeedRollbackParentToken(tokenItem: ITokenItem): boolean {
+    return tokenItem.subType === TokenSubType.SUBTYPE_STOP;
+}
+
+// 是否是闭合元素
+function isClosedToken(tokenItem: ITokenItem): boolean {
+    switch (tokenItem.type) {
         // 以下类型需要特殊判断
+        case TokenType.TYPE_OPERAND:
         case TokenType.TYPE_SUBEXPR:
         case TokenType.TYPE_FUNCTION:
-        case TokenType.TYPE_SET:
-            // 当发现为子表达式结束时,则需要回滚父级
-            if (curTokenItem.subType === TokenSubType.SUBTYPE_STOP) {
-                return true;
-            }
-            break;
+        case TokenType.TYPE_SUBEXPR:
+        case TokenType.TYPE_VARIABLE:
+        case TokenType.TYPE_OP_POST:
+            return true;
     }
     return false;
 }
@@ -407,7 +425,7 @@ function logicalTokenMatch(formula: string, type: TokenType): ITokenItem {
     if (logicalMatch) {
         return {
             sourceToken: logicalMatch[0],
-            subType: TokenSubType.SUBTYPE_MATH,
+            subType: TokenSubType.SUBTYPE_LOGICAL,
             token: logicalMatch[0],
             type
         };

@@ -9,10 +9,12 @@ import {parseToken} from './lib/token';
 class FuncFormulaParser {
     private option: IFormulaOption; // 解析器选项
     private tokenArr: ITokenItem[]; // 词法分析结果
-    constructor(defaultOpt: IFormulaOption) {
-        this.option = Object.assign({
-            autoSyntacticAnalysis: false
-        }, defaultOpt);
+    private sourceFormula: string; // 原始公式
+    constructor(customOpt?: IFormulaOption) {
+        this.option = {
+            customFunc: {},
+            ...customOpt
+        };
     }
     /**
      * 创建令牌词法分析结果
@@ -20,6 +22,10 @@ class FuncFormulaParser {
      * @return {ITokenItem[]}         令牌流
      */
     public setFormula(formula: string): ITokenItem[] {
+        if (formula === this.sourceFormula) {
+            return this.tokenArr;
+        }
+        this.sourceFormula = formula;
         this.tokenArr = parseToken(formula);
         return this.tokenArr;
     }
@@ -32,4 +38,4 @@ class FuncFormulaParser {
     }
 }
 
-export = FuncFormulaParser;
+export default FuncFormulaParser;

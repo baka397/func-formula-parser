@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "a AST parser for formula & formula function",
   "main": "dist/index.js",
+  "types": "index.d.ts",
   "scripts": {
     "commit": "npm run lint && npm run build && npm run cover-test && npm run benchmark",
     "unit-test": "node ./node_modules/mocha/bin/mocha",
