@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var token_1 = require("../types/token");
+var common_1 = require("./common");
 /**
  * 解析令牌
  * @param  {string}       formula 公式字符串
@@ -55,7 +56,7 @@ function parseLineToken(formula, line, lastTokenItem, lastParentTokenTypeList) {
         var tokenObj = parseType(formulaStr, curTokenItem);
         var tokenItem = tokenObj.item;
         if (!tokenItem) {
-            throwSyntaxError(line, curStart, formulaStr, curTokenItem.type + " expect: " + tokenObj.expectType.map(function (item) {
+            throwSyntaxError(line, curStart, formulaStr, curTokenItem.type + " expect: " + tokenObj.expectTypeList.map(function (item) {
                 return "" + item[0] + (item[1] ? ':' + item[1] : '');
             }).join(','));
         }
@@ -92,133 +93,15 @@ function parseLineToken(formula, line, lastTokenItem, lastParentTokenTypeList) {
  * @return {ITokenItem}         令牌对象
  */
 function parseType(formula, prevTokenItem) {
-    var curTypeList = []; // [当前令牌类型, 预期的令牌子类型?]
     var curParentType = prevTokenItem.parentType;
-    var curSubType = prevTokenItem.subType;
-    var curType = prevTokenItem.type;
-    // 对嵌入型参数插入通用类型
-    function insetWrapCommonType() {
-        switch (curParentType) {
-            case null: // 不存在父级时
-                break;
-            // 如果父类型是函数或者集合时
-            case token_1.TokenType.TYPE_FUNCTION:
-                curTypeList.push([token_1.TokenType.TYPE_ARGUMENT, null]);
-                curTypeList.push([token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_STOP]);
-                break;
-            case token_1.TokenType.TYPE_SET:
-                curTypeList.push([token_1.TokenType.TYPE_ARGUMENT, null]);
-                curTypeList.push([token_1.TokenType.TYPE_SET, token_1.TokenSubType.SUBTYPE_STOP]);
-                break;
-            default: // 如果父类型存在,则可以插入结束符
-                curTypeList.push([token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_STOP]);
-                break;
-        }
-    }
-    switch (curType) {
-        case token_1.TokenType.TYPE_START:
-            curTypeList = [
-                [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
-                [token_1.TokenType.TYPE_OP_PRE, null],
-                [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_OPERAND, null]
-            ];
-            break;
-        case token_1.TokenType.TYPE_OPERAND:
-            curTypeList = [
-                [token_1.TokenType.TYPE_OP_IN, null],
-                [token_1.TokenType.TYPE_OP_POST, null]
-            ];
-            insetWrapCommonType();
-            break;
-        case token_1.TokenType.TYPE_FUNCTION:
-            switch (curSubType) { // 查看起始和结束
-                case token_1.TokenSubType.SUBTYPE_START:
-                    curTypeList = [
-                        [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
-                        [token_1.TokenType.TYPE_SET, token_1.TokenSubType.SUBTYPE_START],
-                        [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_OPERAND, null]
-                    ];
-                    break;
-                case token_1.TokenSubType.SUBTYPE_STOP:
-                    curTypeList = [
-                        [token_1.TokenType.TYPE_OP_IN, null]
-                    ];
-                    insetWrapCommonType();
-                    break;
-            }
-            break;
-        case token_1.TokenType.TYPE_SUBEXPR:
-            switch (curSubType) { // 查看起始和结束
-                case token_1.TokenSubType.SUBTYPE_START:
-                    curTypeList = [
-                        [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
-                        [token_1.TokenType.TYPE_OP_PRE, null],
-                        [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_OPERAND, null]
-                    ];
-                    break;
-                case token_1.TokenSubType.SUBTYPE_STOP:
-                    curTypeList = [
-                        [token_1.TokenType.TYPE_OP_IN, null]
-                    ];
-                    insetWrapCommonType();
-                    break;
-            }
-            break;
-        case token_1.TokenType.TYPE_OP_PRE:
-            curTypeList = [
-                [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
-                [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_OPERAND, null]
-            ];
-            break;
-        case token_1.TokenType.TYPE_OP_IN:
-            curTypeList = [
-                [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
-                [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_OPERAND, null]
-            ];
-            break;
-        case token_1.TokenType.TYPE_OP_POST:
-            curTypeList = [
-                [token_1.TokenType.TYPE_OP_IN, null]
-            ];
-            insetWrapCommonType();
-            break;
-        case token_1.TokenType.TYPE_ARGUMENT:
-            curTypeList = [
-                [token_1.TokenType.TYPE_OP_PRE, null],
-                [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
-                [token_1.TokenType.TYPE_SET, token_1.TokenSubType.SUBTYPE_START],
-                [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_OPERAND, null]
-            ];
-            break;
-        case token_1.TokenType.TYPE_SET:
-            switch (curSubType) { // 查看起始和结束
-                case token_1.TokenSubType.SUBTYPE_START:
-                    curTypeList = [
-                        [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
-                        [token_1.TokenType.TYPE_OP_PRE, null],
-                        [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_OPERAND, null]
-                    ];
-                    break;
-                case token_1.TokenSubType.SUBTYPE_STOP:
-                    insetWrapCommonType();
-                    break;
-            }
-            break;
-    }
-    var tokenItem = parseFormulaStr(formula, curTypeList);
+    var expectTypeList = common_1.getExpectTypeByToken(prevTokenItem);
+    var tokenItem = parseFormulaStr(formula, expectTypeList);
     // 如果是结束符时,设置当前类型为父类型
     if (tokenItem && tokenItem.subType === token_1.TokenSubType.SUBTYPE_STOP) {
         tokenItem.type = curParentType;
     }
     return {
-        expectType: curTypeList,
+        expectTypeList: expectTypeList,
         item: tokenItem
     };
 }

@@ -8,6 +8,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var node_1 = require("./lib/node");
 var token_1 = require("./lib/token");
 /**
  * 公式函数解析器
@@ -15,6 +16,8 @@ var token_1 = require("./lib/token");
  */
 var FuncFormulaParser = /** @class */ (function () {
     function FuncFormulaParser(customOpt) {
+        this.tokenArr = []; // 词法分析结果
+        this.nodeTree = null; // 语法分析结果
         this.option = __assign({ autoParseNode: false, customFunc: {} }, customOpt);
     }
     /**
@@ -29,7 +32,22 @@ var FuncFormulaParser = /** @class */ (function () {
         }
         this.sourceFormula = curFormula;
         this.tokenArr = token_1.parseToken(formula);
+        // 如果开启自动解析语法节点,则设置解析,否则,清空已解析的语法节点
+        if (this.option.autoParseNode) {
+            this.parseNode();
+        }
+        else {
+            this.nodeTree = null;
+        }
         return this.tokenArr;
+    };
+    /**
+     * 编译当前令牌的语法节点
+     * @return {INodeItem} 语法节点树
+     */
+    FuncFormulaParser.prototype.parseNode = function () {
+        this.nodeTree = node_1.parseNode(this.tokenArr);
+        return this.nodeTree;
     };
     /**
      * 获取令牌词法分析结果
@@ -37,6 +55,13 @@ var FuncFormulaParser = /** @class */ (function () {
      */
     FuncFormulaParser.prototype.getTokens = function () {
         return this.tokenArr;
+    };
+    /**
+     * 获取已经编译后的语法节点
+     * @return {INodeItem} 语法节点树
+     */
+    FuncFormulaParser.prototype.getNodeTree = function () {
+        return this.nodeTree;
     };
     return FuncFormulaParser;
 }());

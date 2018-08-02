@@ -27,11 +27,11 @@ export enum TokenSubType {
 
 // 子令牌类型值
 export const TokenSubTypeExpReg = {
-    FUNCTION: /^([A-Z_]+)\(/,
+    FUNCTION: /^([a-zA-Z_]+)\(/,
     LOGICAL: /^(>=|<=|<|>|=)/,
     MATH: /^[+\-*/^]/,
     NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(E[1-9][0-9]*|)/,
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
-    VARIABLE: /^[A-Z_\u4e00-\u9fa5]+(?!\()/
+    VARIABLE: /^[a-zA-Z_\u4e00-\u9fa5]+(?!\()/
 };
