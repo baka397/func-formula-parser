@@ -9,8 +9,7 @@ export enum TokenType {
     TYPE_OP_POST = 'operator-postfix', // 后置表达式
     TYPE_ARGUMENT = 'argument', // 参数
     TYPE_SET = 'set', // 集合
-    TYPE_VARIABLE = 'variable', // 变量
-    TOK_TYPE_UNKNOWN = 'unknow' // 未知语句
+    TOK_TYPE_UNKNOWN = 'unknow' // 未知类型
 }
 
 // 令牌子类型
@@ -22,16 +21,17 @@ export enum TokenSubType {
     SUBTYPE_LOGICAL = 'logical', // 逻辑类型
     SUBTYPE_ERROR = 'error', // 错误类型
     SUBTYPE_MATH = 'math', // 数学计算符号
-    SUBTYPE_EMPTY = '' // 空类型
+    SUBTYPE_EMPTY = '', // 空类型
+    SUBTYPE_UNKNOWN = 'unknow' // 未知类型
 }
 
 // 子令牌类型值
 export const TokenSubTypeExpReg = {
     FUNCTION: /^([A-Z_]+)\(/,
     LOGICAL: /^(>=|<=|<|>|=)/,
-    MATH: /^[+\-*/]/,
+    MATH: /^[+\-*/^]/,
     NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(E[1-9][0-9]*|)/,
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
-    VARIABLE: /^[A-Z_\u4e00-\u9fa5]+/
+    VARIABLE: /^[A-Z_\u4e00-\u9fa5]+(?!\()/
 };

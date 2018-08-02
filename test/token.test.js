@@ -361,7 +361,7 @@ describe('Token', function() {
                 },
                 {
                     parentType: TOKEN.TokenType.TYPE_FUNCTION,
-                    type: TOKEN.TokenType.TYPE_VARIABLE,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
                     subType: TOKEN.TokenSubType.TYPE_VARIABLE,
                     token: 'A',
                     row: 1,
@@ -520,7 +520,7 @@ describe('Token', function() {
                 },
                 {
                     parentType: TOKEN.TokenType.TYPE_SET,
-                    type: TOKEN.TokenType.TYPE_VARIABLE,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
                     subType: TOKEN.TokenSubType.SUBTYPE_VARIABLE,
                     token: 'TEST',
                     row: 1,
@@ -608,7 +608,7 @@ describe('Token', function() {
                 },
                 {
                     parentType: TOKEN.TokenType.TYPE_FUNCTION,
-                    type: TOKEN.TokenType.TYPE_VARIABLE,
+                    type: TOKEN.TokenType.TYPE_OPERAND,
                     subType: TOKEN.TokenSubType.TYPE_VARIABLE,
                     token: 'A',
                     row: 2,

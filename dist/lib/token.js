@@ -118,15 +118,13 @@ function parseType(formula, prevTokenItem) {
     switch (curType) {
         case token_1.TokenType.TYPE_START:
             curTypeList = [
-                [token_1.TokenType.TYPE_OPERAND, null],
                 [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                 [token_1.TokenType.TYPE_OP_PRE, null],
                 [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_VARIABLE, null]
+                [token_1.TokenType.TYPE_OPERAND, null]
             ];
             break;
         case token_1.TokenType.TYPE_OPERAND:
-        case token_1.TokenType.TYPE_VARIABLE:
             curTypeList = [
                 [token_1.TokenType.TYPE_OP_IN, null],
                 [token_1.TokenType.TYPE_OP_POST, null]
@@ -137,11 +135,10 @@ function parseType(formula, prevTokenItem) {
             switch (curSubType) { // 查看起始和结束
                 case token_1.TokenSubType.SUBTYPE_START:
                     curTypeList = [
-                        [token_1.TokenType.TYPE_OPERAND, null],
                         [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_SET, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_VARIABLE, null]
+                        [token_1.TokenType.TYPE_OPERAND, null]
                     ];
                     break;
                 case token_1.TokenSubType.SUBTYPE_STOP:
@@ -156,11 +153,10 @@ function parseType(formula, prevTokenItem) {
             switch (curSubType) { // 查看起始和结束
                 case token_1.TokenSubType.SUBTYPE_START:
                     curTypeList = [
-                        [token_1.TokenType.TYPE_OPERAND, null],
                         [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_OP_PRE, null],
                         [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_VARIABLE, null]
+                        [token_1.TokenType.TYPE_OPERAND, null]
                     ];
                     break;
                 case token_1.TokenSubType.SUBTYPE_STOP:
@@ -173,18 +169,16 @@ function parseType(formula, prevTokenItem) {
             break;
         case token_1.TokenType.TYPE_OP_PRE:
             curTypeList = [
-                [token_1.TokenType.TYPE_OPERAND, null],
                 [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                 [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_VARIABLE, null]
+                [token_1.TokenType.TYPE_OPERAND, null]
             ];
             break;
         case token_1.TokenType.TYPE_OP_IN:
             curTypeList = [
-                [token_1.TokenType.TYPE_OPERAND, null],
                 [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                 [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_VARIABLE, null]
+                [token_1.TokenType.TYPE_OPERAND, null]
             ];
             break;
         case token_1.TokenType.TYPE_OP_POST:
@@ -195,23 +189,21 @@ function parseType(formula, prevTokenItem) {
             break;
         case token_1.TokenType.TYPE_ARGUMENT:
             curTypeList = [
-                [token_1.TokenType.TYPE_OPERAND, null],
                 [token_1.TokenType.TYPE_OP_PRE, null],
                 [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                 [token_1.TokenType.TYPE_SET, token_1.TokenSubType.SUBTYPE_START],
                 [token_1.TokenType.TYPE_FUNCTION, null],
-                [token_1.TokenType.TYPE_VARIABLE, null]
+                [token_1.TokenType.TYPE_OPERAND, null]
             ];
             break;
         case token_1.TokenType.TYPE_SET:
             switch (curSubType) { // 查看起始和结束
                 case token_1.TokenSubType.SUBTYPE_START:
                     curTypeList = [
-                        [token_1.TokenType.TYPE_OPERAND, null],
                         [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_OP_PRE, null],
                         [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_VARIABLE, null]
+                        [token_1.TokenType.TYPE_OPERAND, null]
                     ];
                     break;
                 case token_1.TokenSubType.SUBTYPE_STOP:
@@ -244,6 +236,9 @@ function parseFormulaStr(formula, typeList) {
         switch (curType) {
             case token_1.TokenType.TYPE_OPERAND: // 操作对象
                 tokenItem = NumberTokenMatch(formula, curType);
+                if (!tokenItem) {
+                    tokenItem = variableTokenMatch(formula, curType);
+                }
                 break;
             case token_1.TokenType.TYPE_FUNCTION: // 函数
                 tokenItem = functionTokenMatch(formula, curType);
@@ -268,9 +263,6 @@ function parseFormulaStr(formula, typeList) {
                 break;
             case token_1.TokenType.TYPE_SET: // 集合
                 tokenItem = setTokenMatch(formula, curType, curExpectSubType);
-                break;
-            case token_1.TokenType.TYPE_VARIABLE: // 变量
-                tokenItem = variableTokenMatch(formula, curType);
                 break;
         }
         if (tokenItem) {
@@ -308,7 +300,6 @@ function isClosedToken(tokenItem) {
         case token_1.TokenType.TYPE_SUBEXPR:
         case token_1.TokenType.TYPE_FUNCTION:
         case token_1.TokenType.TYPE_SUBEXPR:
-        case token_1.TokenType.TYPE_VARIABLE:
         case token_1.TokenType.TYPE_OP_POST:
             return true;
     }

@@ -12,8 +12,7 @@ var TokenType;
     TokenType["TYPE_OP_POST"] = "operator-postfix";
     TokenType["TYPE_ARGUMENT"] = "argument";
     TokenType["TYPE_SET"] = "set";
-    TokenType["TYPE_VARIABLE"] = "variable";
-    TokenType["TOK_TYPE_UNKNOWN"] = "unknow"; // 未知语句
+    TokenType["TOK_TYPE_UNKNOWN"] = "unknow"; // 未知类型
 })(TokenType = exports.TokenType || (exports.TokenType = {}));
 // 令牌子类型
 var TokenSubType;
@@ -25,15 +24,16 @@ var TokenSubType;
     TokenSubType["SUBTYPE_LOGICAL"] = "logical";
     TokenSubType["SUBTYPE_ERROR"] = "error";
     TokenSubType["SUBTYPE_MATH"] = "math";
-    TokenSubType["SUBTYPE_EMPTY"] = ""; // 空类型
+    TokenSubType["SUBTYPE_EMPTY"] = "";
+    TokenSubType["SUBTYPE_UNKNOWN"] = "unknow"; // 未知类型
 })(TokenSubType = exports.TokenSubType || (exports.TokenSubType = {}));
 // 子令牌类型值
 exports.TokenSubTypeExpReg = {
     FUNCTION: /^([A-Z_]+)\(/,
     LOGICAL: /^(>=|<=|<|>|=)/,
-    MATH: /^[+\-*/]/,
+    MATH: /^[+\-*/^]/,
     NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(E[1-9][0-9]*|)/,
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
-    VARIABLE: /^[A-Z_\u4e00-\u9fa5]+/
+    VARIABLE: /^[A-Z_\u4e00-\u9fa5]+(?!\()/
 };
