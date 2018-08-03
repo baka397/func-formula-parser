@@ -13,10 +13,9 @@ class FuncFormulaParser {
     private sourceFormula: string; // 原始公式
     private tokenArr: ITokenItem[] = []; // 词法分析结果
     private nodeTree: INodeItem = null; // 语法分析结果
-    constructor(customOpt?: IFormulaOption) {
+    constructor(customOpt: IFormulaOption = {}) {
         this.option = {
             autoParseNode: false,
-            customFunc: {},
             ...customOpt
         };
     }
@@ -32,11 +31,10 @@ class FuncFormulaParser {
         }
         this.sourceFormula = curFormula;
         this.tokenArr = parseToken(formula);
-        // 如果开启自动解析语法节点,则设置解析,否则,清空已解析的语法节点
+        this.nodeTree = null; // 清空已解析的语法节点
+        // 如果开启自动解析语法节点,则设置解析
         if (this.option.autoParseNode) {
             this.parseNode();
-        } else {
-            this.nodeTree = null;
         }
         return this.tokenArr;
     }
@@ -45,6 +43,9 @@ class FuncFormulaParser {
      * @return {INodeItem} 语法节点树
      */
     public parseNode(): INodeItem {
+        if (this.nodeTree) {
+            return this.nodeTree;
+        }
         this.nodeTree = parseNode(this.tokenArr);
         return this.nodeTree;
     }

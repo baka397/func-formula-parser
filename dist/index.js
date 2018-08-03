@@ -16,9 +16,10 @@ var token_1 = require("./lib/token");
  */
 var FuncFormulaParser = /** @class */ (function () {
     function FuncFormulaParser(customOpt) {
+        if (customOpt === void 0) { customOpt = {}; }
         this.tokenArr = []; // 词法分析结果
         this.nodeTree = null; // 语法分析结果
-        this.option = __assign({ autoParseNode: false, customFunc: {} }, customOpt);
+        this.option = __assign({ autoParseNode: false }, customOpt);
     }
     /**
      * 创建令牌词法分析结果
@@ -32,12 +33,10 @@ var FuncFormulaParser = /** @class */ (function () {
         }
         this.sourceFormula = curFormula;
         this.tokenArr = token_1.parseToken(formula);
-        // 如果开启自动解析语法节点,则设置解析,否则,清空已解析的语法节点
+        this.nodeTree = null; // 清空已解析的语法节点
+        // 如果开启自动解析语法节点,则设置解析
         if (this.option.autoParseNode) {
             this.parseNode();
-        }
-        else {
-            this.nodeTree = null;
         }
         return this.tokenArr;
     };
@@ -46,6 +45,9 @@ var FuncFormulaParser = /** @class */ (function () {
      * @return {INodeItem} 语法节点树
      */
     FuncFormulaParser.prototype.parseNode = function () {
+        if (this.nodeTree) {
+            return this.nodeTree;
+        }
         this.nodeTree = node_1.parseNode(this.tokenArr);
         return this.nodeTree;
     };

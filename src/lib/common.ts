@@ -89,6 +89,7 @@ export function getExpectTypeByToken(prevTokenItem: ITokenItem): ExpectType[] {
             break;
         case TokenType.TYPE_OP_IN:
             expectTypeList = [
+                [TokenType.TYPE_OP_PRE, null],
                 [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
                 [TokenType.TYPE_FUNCTION, null],
                 [TokenType.TYPE_OPERAND, null]
@@ -135,6 +136,7 @@ export function getMathOperatorPriority(token: ITokenItem): number {
     }
     switch (token.token) {
         case '+':
+            return 1;
         case '-':
             return 2;
         case '*':

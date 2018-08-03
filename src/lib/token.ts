@@ -49,7 +49,7 @@ function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem
     const curLineTokenList: ITokenItem[] = []; // 当前数据
     const curLastTokenType: TokenType = lastParentTokenTypeList[0] || null;
     // 大写并去除公式空格
-    let formulaStr: string = formula.toUpperCase().replace(/\s/g, '');
+    let formulaStr: string = formula.replace(/\s/g, '');
     let curTokenItem: ITokenItem = lastTokenItem; // 当前令牌
     let curStart: number = 0; // 当前起始点
     // 如果没有节点,则直接返回

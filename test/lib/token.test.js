@@ -19,6 +19,42 @@ function validTokenReulst(tokenList, assertResult) {
 
 module.exports = function() {
     describe('Token', function() {
+        describe('Instance Function', function() {
+            it('getTokens', function() {
+                formulaParser.setFormula('1+1');
+                const tokenList = formulaParser.getTokens();
+                const assertResult = [
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '1',
+                        row: 1,
+                        start: 0,
+                        end: 1
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OP_IN,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '+',
+                        row: 1,
+                        start: 1,
+                        end: 2
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '1',
+                        row: 1,
+                        start: 2,
+                        end: 3
+                    }
+                ];
+                validTokenReulst(tokenList, assertResult);
+            });
+        });
         describe('Elementary arithmetic', function() {
             it('1+1', function() {
                 const tokenList = formulaParser.setFormula('1+1');
@@ -103,6 +139,48 @@ module.exports = function() {
                         type: TOKEN.TokenType.TYPE_OP_IN,
                         subType: TOKEN.TokenSubType.SUBTYPE_MATH,
                         token: '+',
+                        row: 1,
+                        start: 1,
+                        end: 2
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '1.2',
+                        row: 1,
+                        start: 2,
+                        end: 5
+                    }
+                ];
+                validTokenReulst(tokenList, assertResult);
+            });
+            it('1*-1.2', function() {
+                const tokenList = formulaParser.setFormula('1*-1.2');
+                const assertResult = [
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '1',
+                        row: 1,
+                        start: 0,
+                        end: 1
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OP_IN,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '*',
+                        row: 1,
+                        start: 1,
+                        end: 2
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OP_PRE,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '-',
                         row: 1,
                         start: 1,
                         end: 2
@@ -249,104 +327,6 @@ module.exports = function() {
                 validTokenReulst(tokenList, assertResult);
             });
         });
-        describe('Instance Function', function() {
-            it('getTokens', function() {
-                const tokenList = formulaParser.getTokens();
-                const assertResult = [
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_SUBEXPR,
-                        subType: TOKEN.TokenSubType.SUBTYPE_START,
-                        token: '',
-                        row: 1,
-                        start: 0,
-                        end: 1
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OPERAND,
-                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
-                        token: '10',
-                        row: 1,
-                        start: 1,
-                        end: 3
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OP_IN,
-                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
-                        token: '+',
-                        row: 1,
-                        start: 3,
-                        end: 4
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OPERAND,
-                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
-                        token: '2',
-                        row: 1,
-                        start: 4,
-                        end: 5
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_SUBEXPR,
-                        subType: TOKEN.TokenSubType.SUBTYPE_STOP,
-                        token: '',
-                        row: 1,
-                        start: 5,
-                        end: 6
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OP_IN,
-                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
-                        token: '*',
-                        row: 1,
-                        start: 6,
-                        end: 7
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OPERAND,
-                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
-                        token: '3',
-                        row: 1,
-                        start: 7,
-                        end: 8
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OP_IN,
-                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
-                        token: '/',
-                        row: 1,
-                        start: 8,
-                        end: 9
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OPERAND,
-                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
-                        token: '5',
-                        row: 1,
-                        start: 9,
-                        end: 10
-                    },
-                    {
-                        parentType: null,
-                        type: TOKEN.TokenType.TYPE_OP_POST,
-                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
-                        token: '%',
-                        row: 1,
-                        start: 10,
-                        end: 11
-                    }
-                ];
-                validTokenReulst(tokenList, assertResult);
-            });
-        });
         describe('Function', function() {
             it('IF(a>=0,count(3,4,5),5%)', function() {
                 const tokenList = formulaParser.setFormula('IF(a>=0,count(3,4,5),5%)');
@@ -364,7 +344,7 @@ module.exports = function() {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
                         type: TOKEN.TokenType.TYPE_OPERAND,
                         subType: TOKEN.TokenSubType.TYPE_VARIABLE,
-                        token: 'A',
+                        token: 'a',
                         row: 1,
                         start: 3,
                         end: 4

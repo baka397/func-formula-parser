@@ -44,7 +44,7 @@ function parseLineToken(formula, line, lastTokenItem, lastParentTokenTypeList) {
     var curLineTokenList = []; // 当前数据
     var curLastTokenType = lastParentTokenTypeList[0] || null;
     // 大写并去除公式空格
-    var formulaStr = formula.toUpperCase().replace(/\s/g, '');
+    var formulaStr = formula.replace(/\s/g, '');
     var curTokenItem = lastTokenItem; // 当前令牌
     var curStart = 0; // 当前起始点
     // 如果没有节点,则直接返回

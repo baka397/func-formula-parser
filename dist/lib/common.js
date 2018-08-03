@@ -87,6 +87,7 @@ function getExpectTypeByToken(prevTokenItem) {
             break;
         case token_1.TokenType.TYPE_OP_IN:
             expectTypeList = [
+                [token_1.TokenType.TYPE_OP_PRE, null],
                 [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                 [token_1.TokenType.TYPE_FUNCTION, null],
                 [token_1.TokenType.TYPE_OPERAND, null]
@@ -133,6 +134,7 @@ function getMathOperatorPriority(token) {
     }
     switch (token.token) {
         case '+':
+            return 1;
         case '-':
             return 2;
         case '*':

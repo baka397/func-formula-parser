@@ -30,7 +30,7 @@ export const TokenSubTypeExpReg = {
     FUNCTION: /^([a-zA-Z_]+)\(/,
     LOGICAL: /^(>=|<=|<|>|=)/,
     MATH: /^[+\-*/^]/,
-    NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(E[1-9][0-9]*|)/,
+    NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(e[1-9][0-9]*|)/,
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
     VARIABLE: /^[a-zA-Z_\u4e00-\u9fa5]+(?!\()/
