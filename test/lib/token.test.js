@@ -23,8 +23,7 @@ module.exports = function() {
     describe('Token', function() {
         describe('Instance Function', function() {
             it('getTokens', function() {
-                formulaParser.setFormula('1+ 1');
-                const tokenList = formulaParser.getTokens();
+                const tokenList = formulaParser.setFormula('1+ 1');
                 const assertResult = [
                     {
                         parentType: null,
@@ -61,6 +60,7 @@ module.exports = function() {
                     }
                 ];
                 validTokenReulst(tokenList, assertResult);
+                assert(tokenList === formulaParser.getTokens());
             });
         });
         describe('Elementary arithmetic', function() {

@@ -21,6 +21,7 @@ module.exports = function() {
             it('parseNode', function() {
                 const unautoformulaParser = new FuncFormulaParser();
                 unautoformulaParser.setFormula('1+2');
+                const nodeTree = unautoformulaParser.parseNode();
                 const assertNodeTree = {
                     token: '+',
                     children: [
@@ -32,13 +33,15 @@ module.exports = function() {
                         }
                     ]
                 };
-                validTokenReulst(unautoformulaParser.parseNode(), assertNodeTree);
+                validTokenReulst(nodeTree, assertNodeTree);
+                assert(nodeTree === unautoformulaParser.getNodeTree());
             });
             it('parseNode with already formula', function() {
                 const autoformulaParser = new FuncFormulaParser({
                     autoParseNode: true
                 });
                 autoformulaParser.setFormula('1+2');
+                const nodeTree = autoformulaParser.parseNode();
                 const assertNodeTree = {
                     token: '+',
                     children: [
@@ -50,8 +53,8 @@ module.exports = function() {
                         }
                     ]
                 };
-                validTokenReulst(autoformulaParser.parseNode(), assertNodeTree);
-                validTokenReulst(autoformulaParser.parseNode(), assertNodeTree);
+                validTokenReulst(nodeTree, assertNodeTree);
+                assert(nodeTree === autoformulaParser.parseNode());
             });
         });
         describe('Elementary arithmetic', function() {

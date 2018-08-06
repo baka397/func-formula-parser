@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "types": "index.d.ts",
   "scripts": {
-    "commit": "npm run lint && npm run build && npm run cover-test && npm run benchmark",
+    "commit": "npm run build && npm run cover-test && npm run benchmark",
     "unit-test": "node ./node_modules/mocha/bin/mocha",
     "cover-test": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
-    "build": "tsc",
+    "build": "npm run lint && tsc",
     "lint": "tslint -c tslint.json -p tsconfig.json && eslint test/",
     "benchmark": "node test/benchmark/"
   },
