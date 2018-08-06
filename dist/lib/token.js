@@ -10,6 +10,13 @@ var common_1 = require("./common");
 function parseToken(formula) {
     var formulaList = formula.split('\n');
     var curTokenItem = {
+        loc: {
+            end: 0,
+            row: 0,
+            sourceEnd: 0,
+            sourceStart: 0,
+            start: 0
+        },
         sourceToken: '',
         subType: token_1.TokenSubType.SUBTYPE_EMPTY,
         token: '',
@@ -40,13 +47,13 @@ function throwSyntaxError(line, col, formulaStr, desc) {
     throw new SyntaxError("Token parse Error(" + line + ":" + col + "): \"" + formulaStr + "\"\n        " + desc);
 }
 // 单行解析令牌
-function parseLineToken(formula, line, lastTokenItem, lastParentTokenTypeList) {
+function parseLineToken(formulaStr, line, lastTokenItem, lastParentTokenTypeList) {
     var curLineTokenList = []; // 当前数据
     var curLastTokenType = lastParentTokenTypeList[0] || null;
-    // 大写并去除公式空格
-    var formulaStr = formula.replace(/\s/g, '');
     var curTokenItem = lastTokenItem; // 当前令牌
     var curStart = 0; // 当前起始点
+    var sourceStart = lastTokenItem.loc.sourceEnd; // 当前起始点
+    var sourceEnd = sourceStart; // 当前结束点
     // 如果没有节点,则直接返回
     if (formulaStr.length === 0) {
         return curLineTokenList;
@@ -60,11 +67,21 @@ function parseLineToken(formula, line, lastTokenItem, lastParentTokenTypeList) {
                 return "" + item[0] + (item[1] ? ':' + item[1] : '');
             }).join(','));
         }
+        formulaStr = formulaStr.substring(tokenItem.sourceToken.length);
+        // 如果是空格时,跳过,并记录节点
+        if (tokenItem.type === token_1.TokenType.TYPE_SPACE) {
+            sourceStart = sourceStart + tokenItem.sourceToken.length;
+            sourceEnd = sourceEnd + tokenItem.sourceToken.length;
+            curStart = curStart + tokenItem.sourceToken.length;
+            continue;
+        }
         // 更新数据
         // 更新坐标
         tokenItem.loc = {
             end: curStart + tokenItem.sourceToken.length,
             row: line,
+            sourceEnd: sourceEnd + tokenItem.sourceToken.length,
+            sourceStart: sourceStart,
             start: curStart
         };
         // 检测是否需要回滚到上级父令牌
@@ -82,8 +99,10 @@ function parseLineToken(formula, line, lastTokenItem, lastParentTokenTypeList) {
         }
         curLineTokenList.push(tokenItem);
         curTokenItem = tokenItem;
+        // 重置索引坐标
         curStart = tokenItem.loc.end;
-        formulaStr = formulaStr.substring(tokenItem.sourceToken.length);
+        sourceStart = tokenItem.loc.sourceEnd;
+        sourceEnd = tokenItem.loc.sourceEnd;
     }
     return curLineTokenList;
 }
@@ -113,12 +132,17 @@ function parseType(formula, prevTokenItem) {
  */
 function parseFormulaStr(formula, typeList) {
     var tokenItem;
+    // 检查空格
+    tokenItem = spaceTokenMatch(formula, token_1.TokenType.TYPE_SPACE);
+    if (tokenItem) {
+        return tokenItem;
+    }
     var result = typeList.some(function (type) {
         var curType = type[0];
         var curExpectSubType = type[1];
         switch (curType) {
             case token_1.TokenType.TYPE_OPERAND: // 操作对象
-                tokenItem = NumberTokenMatch(formula, curType);
+                tokenItem = numberTokenMatch(formula, curType);
                 if (!tokenItem) {
                     tokenItem = variableTokenMatch(formula, curType);
                 }
@@ -192,7 +216,19 @@ function isClosedToken(tokenItem) {
  * 以下为各个匹配数据类型函数
  */
 // 匹配数字令牌
-function NumberTokenMatch(formula, type) {
+function spaceTokenMatch(formula, type) {
+    var spaceMatch = formula.match(token_1.TokenSubTypeExpReg.SPACE);
+    if (spaceMatch) {
+        return {
+            sourceToken: spaceMatch[0],
+            subType: token_1.TokenSubType.SUBTYPE_EMPTY,
+            token: '',
+            type: type
+        };
+    }
+}
+// 匹配数字令牌
+function numberTokenMatch(formula, type) {
     var numberMatch = formula.match(token_1.TokenSubTypeExpReg.NUMBER);
     if (numberMatch) {
         return {

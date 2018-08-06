@@ -9,6 +9,7 @@ export enum TokenType {
     TYPE_OP_POST = 'operator-postfix', // 后置表达式
     TYPE_ARGUMENT = 'argument', // 参数
     TYPE_SET = 'set', // 集合
+    TYPE_SPACE = 'space', // 空格
     TOK_TYPE_UNKNOWN = 'unknow' // 未知类型
 }
 
@@ -33,5 +34,6 @@ export const TokenSubTypeExpReg = {
     NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(e[1-9][0-9]*|)/,
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
+    SPACE: /^\s+/,
     VARIABLE: /^[a-zA-Z_\u4e00-\u9fa5]+(?!\()/
 };

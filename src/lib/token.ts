@@ -13,6 +13,13 @@ import {getExpectTypeByToken} from './common';
 export function parseToken(formula: string): ITokenItem[] {
     const formulaList: string[] = formula.split('\n');
     let curTokenItem: ITokenItem = {
+        loc: {
+            end: 0,
+            row: 0,
+            sourceEnd: 0,
+            sourceStart: 0,
+            start: 0
+        },
         sourceToken: '',
         subType: TokenSubType.SUBTYPE_EMPTY,
         token: '',
@@ -45,13 +52,13 @@ function throwSyntaxError(line: number, col: number, formulaStr: string, desc: s
 }
 
 // 单行解析令牌
-function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem, lastParentTokenTypeList: TokenType[]): ITokenItem[] {
+function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenItem, lastParentTokenTypeList: TokenType[]): ITokenItem[] {
     const curLineTokenList: ITokenItem[] = []; // 当前数据
     const curLastTokenType: TokenType = lastParentTokenTypeList[0] || null;
-    // 大写并去除公式空格
-    let formulaStr: string = formula.replace(/\s/g, '');
     let curTokenItem: ITokenItem = lastTokenItem; // 当前令牌
     let curStart: number = 0; // 当前起始点
+    let sourceStart: number = lastTokenItem.loc.sourceEnd; // 当前起始点
+    let sourceEnd: number = sourceStart; // 当前结束点
     // 如果没有节点,则直接返回
     if (formulaStr.length === 0) {
         return curLineTokenList;
@@ -65,11 +72,21 @@ function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem
                 return `${item[0]}${item[1] ? ':' + item[1] : ''}`;
             }).join(',')}`);
         }
+        formulaStr = formulaStr.substring(tokenItem.sourceToken.length);
+        // 如果是空格时,跳过,并记录节点
+        if (tokenItem.type === TokenType.TYPE_SPACE) {
+            sourceStart = sourceStart + tokenItem.sourceToken.length;
+            sourceEnd = sourceEnd + tokenItem.sourceToken.length;
+            curStart = curStart + tokenItem.sourceToken.length;
+            continue;
+        }
         // 更新数据
         // 更新坐标
         tokenItem.loc = {
             end: curStart + tokenItem.sourceToken.length,
             row: line,
+            sourceEnd: sourceEnd + tokenItem.sourceToken.length,
+            sourceStart,
             start: curStart
         };
         // 检测是否需要回滚到上级父令牌
@@ -87,8 +104,10 @@ function parseLineToken(formula: string, line: number, lastTokenItem: ITokenItem
         }
         curLineTokenList.push(tokenItem);
         curTokenItem = tokenItem;
+        // 重置索引坐标
         curStart = tokenItem.loc.end;
-        formulaStr = formulaStr.substring(tokenItem.sourceToken.length);
+        sourceStart = tokenItem.loc.sourceEnd;
+        sourceEnd = tokenItem.loc.sourceEnd;
     }
     return curLineTokenList;
 }
@@ -123,12 +142,17 @@ function parseType(formula: string, prevTokenItem: ITokenItem): {
  */
 function parseFormulaStr(formula: string, typeList: ExpectType[]): ITokenItem {
     let tokenItem: ITokenItem;
+    // 检查空格
+    tokenItem = spaceTokenMatch(formula, TokenType.TYPE_SPACE);
+    if (tokenItem) {
+        return tokenItem;
+    }
     const result = typeList.some((type) => {
         const curType: TokenType = type[0];
         const curExpectSubType: TokenSubType = type[1];
         switch (curType) {
             case TokenType.TYPE_OPERAND: // 操作对象
-                tokenItem = NumberTokenMatch(formula, curType);
+                tokenItem = numberTokenMatch(formula, curType);
                 if (!tokenItem) {
                     tokenItem = variableTokenMatch(formula, curType);
                 }
@@ -207,7 +231,20 @@ function isClosedToken(tokenItem: ITokenItem): boolean {
  */
 
 // 匹配数字令牌
-function NumberTokenMatch(formula: string, type: TokenType): ITokenItem {
+function spaceTokenMatch(formula: string, type: TokenType): ITokenItem {
+    const spaceMatch = formula.match(TokenSubTypeExpReg.SPACE);
+    if (spaceMatch) {
+        return {
+            sourceToken: spaceMatch[0],
+            subType: TokenSubType.SUBTYPE_EMPTY,
+            token: '',
+            type
+        };
+    }
+}
+
+// 匹配数字令牌
+function numberTokenMatch(formula: string, type: TokenType): ITokenItem {
     const numberMatch = formula.match(TokenSubTypeExpReg.NUMBER);
     if (numberMatch) {
         return {

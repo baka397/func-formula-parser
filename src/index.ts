@@ -25,7 +25,7 @@ class FuncFormulaParser {
      * @return {ITokenItem[]}         令牌流
      */
     public setFormula(formula: string): ITokenItem[] {
-        const curFormula = formula.replace(/[\n\s]/g, '');
+        const curFormula = formula.replace(/[\n]/g, '');
         if (curFormula === this.sourceFormula) {
             return this.tokenArr;
         }

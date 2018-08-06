@@ -12,6 +12,7 @@ var TokenType;
     TokenType["TYPE_OP_POST"] = "operator-postfix";
     TokenType["TYPE_ARGUMENT"] = "argument";
     TokenType["TYPE_SET"] = "set";
+    TokenType["TYPE_SPACE"] = "space";
     TokenType["TOK_TYPE_UNKNOWN"] = "unknow"; // 未知类型
 })(TokenType = exports.TokenType || (exports.TokenType = {}));
 // 令牌子类型
@@ -35,5 +36,6 @@ exports.TokenSubTypeExpReg = {
     NUMBER: /^([1-9][0-9]*|[0-9])(\.[0-9]*[1-9]|)(e[1-9][0-9]*|)/,
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
+    SPACE: /^\s+/,
     VARIABLE: /^[a-zA-Z_\u4e00-\u9fa5]+(?!\()/
 };

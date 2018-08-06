@@ -27,7 +27,7 @@ var FuncFormulaParser = /** @class */ (function () {
      * @return {ITokenItem[]}         令牌流
      */
     FuncFormulaParser.prototype.setFormula = function (formula) {
-        var curFormula = formula.replace(/[\n\s]/g, '');
+        var curFormula = formula.replace(/[\n]/g, '');
         if (curFormula === this.sourceFormula) {
             return this.tokenArr;
         }
