@@ -1,6 +1,6 @@
 {
   "name": "func-formula-parser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "a AST parser for formula & formula function",
   "main": "dist/index.js",
   "types": "src/index.d.ts",
