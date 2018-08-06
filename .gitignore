@@ -1,0 +1,10 @@
+# files
+.git
+*.log
+*.zip
+
+# folders
+node_modules/
+logs/
+coverage/
+*.log

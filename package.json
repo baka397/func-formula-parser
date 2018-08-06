@@ -1,0 +1,46 @@
+{
+  "name": "func-formula-parser",
+  "version": "0.1.0",
+  "description": "a AST parser for formula & formula function",
+  "main": "dist/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "commit": "npm run build && npm run cover-test && npm run benchmark",
+    "unit-test": "node ./node_modules/mocha/bin/mocha",
+    "cover-test": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
+    "build": "npm run lint && tsc",
+    "lint": "tslint -c tslint.json -p tsconfig.json && eslint test/",
+    "benchmark": "node test/benchmark/"
+  },
+  "pre-commit": [
+    "commit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baka397/func-formula-parser.git"
+  },
+  "keywords": [
+    "formula",
+    "parser"
+  ],
+  "author": "bakajinsei <cqggff@live.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/baka397/func-formula-parser/issues"
+  },
+  "homepage": "https://github.com/baka397/func-formula-parser#readme",
+  "engines": {
+    "node": ">=4"
+  },
+  "devDependencies": {
+    "benchmark": "^2.1.4",
+    "chalk": "^2.4.1",
+    "eslint": "^5.2.0",
+    "intelli-espower-loader": "^1.0.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.2.0",
+    "power-assert": "^1.6.0",
+    "tslint": "^5.11.0",
+    "typescript": "^2.9.2"
+  }
+}

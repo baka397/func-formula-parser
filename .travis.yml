@@ -1,0 +1,14 @@
+sudo: false
+
+language: node_js
+
+node_js:
+  - 4
+  - 6
+  - 8
+  - stable
+
+script: npm run cover-test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
