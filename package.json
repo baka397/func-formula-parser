@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/baka397/func-formula-parser#readme",
   "engines": {
-    "node": ">=6"
+    "node": ">=4"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
