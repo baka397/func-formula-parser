@@ -1,9 +1,9 @@
 {
   "name": "func-formula-parser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "a AST parser for formula & formula function",
   "main": "dist/index.js",
-  "types": "index.d.ts",
+  "types": "src/index.d.ts",
   "scripts": {
     "commit": "npm run build && npm run cover-test && npm run benchmark",
     "unit-test": "node ./node_modules/mocha/bin/mocha",
