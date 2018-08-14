@@ -388,6 +388,100 @@ module.exports = function() {
             });
         });
         describe('Function', function() {
+            it('Round(-1, -5%)', function() {
+                const tokenList = formulaParser.setFormula('Round(-1, -5%)');
+                const assertResult = [
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_START,
+                        token: 'Round',
+                        row: 1,
+                        start: 0,
+                        end: 6,
+                        sourceStart: 0,
+                        sourceEnd: 6
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OP_PRE,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '-',
+                        row: 1,
+                        start: 6,
+                        end: 7,
+                        sourceStart: 6,
+                        sourceEnd: 7
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '1',
+                        row: 1,
+                        start: 7,
+                        end: 8,
+                        sourceStart: 7,
+                        sourceEnd: 8
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_ARGUMENT,
+                        subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
+                        token: '',
+                        row: 1,
+                        start: 8,
+                        end: 9,
+                        sourceStart: 8,
+                        sourceEnd: 9
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OP_PRE,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '-',
+                        row: 1,
+                        start: 10,
+                        end: 11,
+                        sourceStart: 10,
+                        sourceEnd: 11
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '5',
+                        row: 1,
+                        start: 11,
+                        end: 12,
+                        sourceStart: 11,
+                        sourceEnd: 12
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OP_POST,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '%',
+                        row: 1,
+                        start: 12,
+                        end: 13,
+                        sourceStart: 12,
+                        sourceEnd: 13
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_STOP,
+                        token: '',
+                        row: 1,
+                        start: 13,
+                        end: 14,
+                        sourceStart: 13,
+                        sourceEnd: 14
+                    }
+                ];
+                validTokenReulst(tokenList, assertResult);
+            });
             it('IF(a>=0,count(3,4,5),5%)', function() {
                 const tokenList = formulaParser.setFormula('IF(a>=0,count(3,4,5),5%)');
                 const assertResult = [

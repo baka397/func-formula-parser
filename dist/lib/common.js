@@ -49,7 +49,8 @@ function getExpectTypeByToken(prevTokenItem) {
                         [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_SET, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_OPERAND, null]
+                        [token_1.TokenType.TYPE_OPERAND, null],
+                        [token_1.TokenType.TYPE_OP_PRE, null]
                     ];
                     break;
                 case token_1.TokenSubType.SUBTYPE_STOP:

@@ -51,7 +51,8 @@ export function getExpectTypeByToken(prevTokenItem: ITokenItem): ExpectType[] {
                         [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START], // 子表达式
                         [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START], // 集合起始
                         [TokenType.TYPE_FUNCTION, null],
-                        [TokenType.TYPE_OPERAND, null]
+                        [TokenType.TYPE_OPERAND, null],
+                        [TokenType.TYPE_OP_PRE, null]
                     ];
                     break;
                 case TokenSubType.SUBTYPE_STOP:
