@@ -112,12 +112,12 @@ function parseLineToken(formulaStr, line, lastTokenItem, lastParentTokenTypeList
  * @return {ITokenItem}         令牌对象
  */
 function parseType(formula, prevTokenItem) {
-    var curParentType = prevTokenItem.parentType;
     var expectTypeList = common_1.getExpectTypeByToken(prevTokenItem);
     var tokenItem = parseFormulaStr(formula, expectTypeList);
     // 如果是结束符时,设置当前类型为父类型
     if (tokenItem && tokenItem.subType === token_1.TokenSubType.SUBTYPE_STOP) {
-        tokenItem.type = curParentType;
+        // 检测前一个类型是否为闭合直接设置父类型或
+        tokenItem.type = isParentToken(prevTokenItem) ? prevTokenItem.type : prevTokenItem.parentType;
     }
     return {
         expectTypeList: expectTypeList,
@@ -208,6 +208,16 @@ function isClosedToken(tokenItem) {
         case token_1.TokenType.TYPE_FUNCTION:
         case token_1.TokenType.TYPE_SUBEXPR:
         case token_1.TokenType.TYPE_OP_POST:
+            return true;
+    }
+    return false;
+}
+// 是否为父级元素
+function isParentToken(tokenItem) {
+    switch (tokenItem.type) {
+        // 以下类型需要特殊判断
+        case token_1.TokenType.TYPE_FUNCTION:
+        case token_1.TokenType.TYPE_SUBEXPR:
             return true;
     }
     return false;

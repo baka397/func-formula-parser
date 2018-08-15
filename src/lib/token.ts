@@ -121,12 +121,12 @@ function parseType(formula: string, prevTokenItem: ITokenItem): {
     expectTypeList: ExpectType[],
     item: ITokenItem
 } {
-    const curParentType = prevTokenItem.parentType;
     const expectTypeList: ExpectType[] = getExpectTypeByToken(prevTokenItem);
     const tokenItem = parseFormulaStr(formula, expectTypeList);
     // 如果是结束符时,设置当前类型为父类型
     if (tokenItem && tokenItem.subType === TokenSubType.SUBTYPE_STOP) {
-        tokenItem.type = curParentType;
+        // 检测前一个类型是否为闭合直接设置父类型或
+        tokenItem.type = isParentToken(prevTokenItem) ? prevTokenItem.type : prevTokenItem.parentType;
     }
     return {
         expectTypeList,
@@ -221,6 +221,17 @@ function isClosedToken(tokenItem: ITokenItem): boolean {
         case TokenType.TYPE_FUNCTION:
         case TokenType.TYPE_SUBEXPR:
         case TokenType.TYPE_OP_POST:
+            return true;
+    }
+    return false;
+}
+
+// 是否为父级元素
+function isParentToken(tokenItem: ITokenItem): boolean {
+    switch (tokenItem.type) {
+        // 以下类型需要特殊判断
+        case TokenType.TYPE_FUNCTION:
+        case TokenType.TYPE_SUBEXPR:
             return true;
     }
     return false;

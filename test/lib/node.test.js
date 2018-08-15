@@ -264,6 +264,45 @@ module.exports = function() {
             });
         });
         describe('Function', function() {
+            it('IF(Empty(),-count(3,4,5),5%)', function() {
+                formulaParser.setFormula('IF(Empty(),-count(3,4,5),5%)');
+                const assertNodeTree = {
+                    token: 'IF',
+                    children: [
+                        {
+                            token: 'Empty'
+                        },
+                        {
+                            token: '-',
+                            children: [
+                                {
+                                    token: 'count',
+                                    children: [
+                                        {
+                                            token: '3'
+                                        },
+                                        {
+                                            token: '4'
+                                        },
+                                        {
+                                            token: '5'
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            token: '%',
+                            children: [
+                                {
+                                    token: '5'
+                                }
+                            ]
+                        }
+                    ]
+                };
+                validTokenReulst(formulaParser.getNodeTree(), assertNodeTree);
+            });
             it('IF(a>=0,-count(3,4,5),5%)', function() {
                 formulaParser.setFormula('IF(a>=0,-count(3,4,5),5%)');
                 const assertNodeTree = {

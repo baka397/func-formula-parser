@@ -388,6 +388,34 @@ module.exports = function() {
             });
         });
         describe('Function', function() {
+            it('Empty()', function() {
+                const tokenList = formulaParser.setFormula('Empty()');
+                const assertResult = [
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_START,
+                        token: 'Empty',
+                        row: 1,
+                        start: 0,
+                        end: 6,
+                        sourceStart: 0,
+                        sourceEnd: 6
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_STOP,
+                        token: '',
+                        row: 1,
+                        start: 6,
+                        end: 7,
+                        sourceStart: 6,
+                        sourceEnd: 7
+                    }
+                ];
+                validTokenReulst(tokenList, assertResult);
+            });
             it('Round(-1, -5%)', function() {
                 const tokenList = formulaParser.setFormula('Round(-1, -5%)');
                 const assertResult = [
