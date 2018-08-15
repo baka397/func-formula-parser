@@ -69,6 +69,11 @@ function parseItemNode(token: ITokenItem, lastRootNodeItem: INodeItem, nodeIndex
                 insetNodeItem(nodeItem, lastRootNodeItem, nodeIndex);
                 return nodeItem;
             }
+            // 如果上一个为起始,则直接返回
+            const prevNodeItem = getNodeItemWithIndex(nodeItemTree, nodeIndex);
+            if (prevNodeItem.token.subType === TokenSubType.SUBTYPE_START && prevNodeItem.token.type === token.type) {
+                return prevNodeItem;
+            }
             return rollbackNodeItem(nodeItemTree, nodeIndex, (validNodeItem) => {
                 return validNodeItem.token.subType !== TokenSubType.SUBTYPE_START;
             });

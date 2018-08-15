@@ -264,38 +264,80 @@ module.exports = function() {
             });
         });
         describe('Function', function() {
-            it('IF(Empty(),-count(3,4,5),5%)', function() {
-                formulaParser.setFormula('IF(Empty(),-count(3,4,5),5%)');
+            it('100 + IF( CaseContentNonnull(), CaseAmount(测试), 2 ) + RoundUp( CaseContentCountIntersection({1, 2}) * 0.1, 1 ) + CaseContentCountOption(1)', function() {
+                formulaParser.setFormula('100 + IF( CaseContentNonnull(), CaseAmount(测试), 2 ) + RoundUp( CaseContentCountIntersection({1, 2}) * 0.1, 1 ) + CaseContentCountOption(1)');
                 const assertNodeTree = {
-                    token: 'IF',
+                    token: '+',
                     children: [
                         {
-                            token: 'Empty'
+                            token: '100'
                         },
                         {
-                            token: '-',
+                            token: '+',
                             children: [
                                 {
-                                    token: 'count',
+                                    token: 'IF',
                                     children: [
                                         {
-                                            token: '3'
+                                            token: 'CaseContentNonnull'
                                         },
                                         {
-                                            token: '4'
+                                            token: 'CaseAmount',
+                                            children: [
+                                                {
+                                                    token: '测试'
+                                                }
+                                            ]
                                         },
                                         {
-                                            token: '5'
+                                            token: '2'
                                         }
                                     ]
-                                }
-                            ]
-                        },
-                        {
-                            token: '%',
-                            children: [
+                                },
                                 {
-                                    token: '5'
+                                    token: '+',
+                                    children: [
+                                        {
+                                            token: 'RoundUp',
+                                            children: [
+                                                {
+                                                    token: '*',
+                                                    children: [
+                                                        {
+                                                            token: 'CaseContentCountIntersection',
+                                                            children: [
+                                                                {
+                                                                    token: '', // set
+                                                                    children: [
+                                                                        {
+                                                                            token: '1'
+                                                                        },
+                                                                        {
+                                                                            token: '2'
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            token: '0.1'
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    token: '1'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            token: 'CaseContentCountOption',
+                                            children: [
+                                                {
+                                                    token: '1'
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
