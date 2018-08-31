@@ -1,6 +1,6 @@
 {
   "name": "func-formula-parser",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "a AST parser for formula & formula function",
   "main": "dist/index.js",
   "types": "src/index.d.ts",
@@ -10,7 +10,8 @@
     "cover-test": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
     "build": "npm run lint && tsc",
     "lint": "tslint -c tslint.json -p tsconfig.json && eslint test/",
-    "benchmark": "node test/benchmark/"
+    "benchmark": "node test/benchmark/",
+    "declaration": "tsc --declaration src/index.ts && git clean -f src/*.js && git clean -f src/*/*.d.ts"
   },
   "pre-commit": [
     "commit"
