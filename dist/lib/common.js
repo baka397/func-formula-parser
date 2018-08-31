@@ -46,10 +46,12 @@ function getExpectTypeByToken(prevTokenItem) {
             switch (curSubType) { // 查看起始和结束
                 case token_1.TokenSubType.SUBTYPE_START:
                     expectTypeList = [
+                        [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_STOP],
                         [token_1.TokenType.TYPE_SUBEXPR, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_SET, token_1.TokenSubType.SUBTYPE_START],
                         [token_1.TokenType.TYPE_FUNCTION, null],
-                        [token_1.TokenType.TYPE_OPERAND, null]
+                        [token_1.TokenType.TYPE_OPERAND, null],
+                        [token_1.TokenType.TYPE_OP_PRE, null]
                     ];
                     break;
                 case token_1.TokenSubType.SUBTYPE_STOP:

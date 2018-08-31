@@ -48,10 +48,12 @@ export function getExpectTypeByToken(prevTokenItem: ITokenItem): ExpectType[] {
             switch (curSubType) { // 查看起始和结束
                 case TokenSubType.SUBTYPE_START:
                     expectTypeList = [
+                        [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_STOP], // 函数结束符,空函数
                         [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START], // 子表达式
                         [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START], // 集合起始
                         [TokenType.TYPE_FUNCTION, null],
-                        [TokenType.TYPE_OPERAND, null]
+                        [TokenType.TYPE_OPERAND, null],
+                        [TokenType.TYPE_OP_PRE, null]
                     ];
                     break;
                 case TokenSubType.SUBTYPE_STOP:

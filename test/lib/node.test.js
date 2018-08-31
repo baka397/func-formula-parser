@@ -264,6 +264,87 @@ module.exports = function() {
             });
         });
         describe('Function', function() {
+            it('100 + IF( CaseContentNonnull(), CaseAmount(测试), 2 ) + RoundUp( CaseContentCountIntersection({1, 2}) * 0.1, 1 ) + CaseContentCountOption(1)', function() {
+                formulaParser.setFormula('100 + IF( CaseContentNonnull(), CaseAmount(测试), 2 ) + RoundUp( CaseContentCountIntersection({1, 2}) * 0.1, 1 ) + CaseContentCountOption(1)');
+                const assertNodeTree = {
+                    token: '+',
+                    children: [
+                        {
+                            token: '100'
+                        },
+                        {
+                            token: '+',
+                            children: [
+                                {
+                                    token: 'IF',
+                                    children: [
+                                        {
+                                            token: 'CaseContentNonnull'
+                                        },
+                                        {
+                                            token: 'CaseAmount',
+                                            children: [
+                                                {
+                                                    token: '测试'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            token: '2'
+                                        }
+                                    ]
+                                },
+                                {
+                                    token: '+',
+                                    children: [
+                                        {
+                                            token: 'RoundUp',
+                                            children: [
+                                                {
+                                                    token: '*',
+                                                    children: [
+                                                        {
+                                                            token: 'CaseContentCountIntersection',
+                                                            children: [
+                                                                {
+                                                                    token: '', // set
+                                                                    children: [
+                                                                        {
+                                                                            token: '1'
+                                                                        },
+                                                                        {
+                                                                            token: '2'
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            token: '0.1'
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    token: '1'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            token: 'CaseContentCountOption',
+                                            children: [
+                                                {
+                                                    token: '1'
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+                validTokenReulst(formulaParser.getNodeTree(), assertNodeTree);
+            });
             it('IF(a>=0,-count(3,4,5),5%)', function() {
                 formulaParser.setFormula('IF(a>=0,-count(3,4,5),5%)');
                 const assertNodeTree = {
