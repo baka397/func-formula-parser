@@ -41,6 +41,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "power-assert": "^1.6.0",
+    "pre-commit": "^1.2.2",
     "tslint": "^5.11.0",
     "typescript": "^2.9.2"
   }
