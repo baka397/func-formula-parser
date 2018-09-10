@@ -31,8 +31,8 @@ var FuncFormulaParser = /** @class */ (function () {
         if (curFormula === this.sourceFormula) {
             return this.tokenArr;
         }
-        this.sourceFormula = curFormula;
         this.tokenArr = token_1.parseToken(formula);
+        this.sourceFormula = curFormula; // 设置缓存公式
         this.nodeTree = null; // 清空已解析的语法节点
         // 如果开启自动解析语法节点,则设置解析
         if (this.option.autoParseNode) {
