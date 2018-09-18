@@ -416,6 +416,67 @@ module.exports = function() {
                 ];
                 validTokenReulst(tokenList, assertResult);
             });
+            it('Variable(1a测试, 2)', function() {
+                const tokenList = formulaParser.setFormula('Variable(1a测试, 2)');
+                const assertResult = [
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_START,
+                        token: 'Variable',
+                        row: 1,
+                        start: 0,
+                        end: 9,
+                        sourceStart: 0,
+                        sourceEnd: 9
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_VARIABLE,
+                        token: '1a测试',
+                        row: 1,
+                        start: 9,
+                        end: 13,
+                        sourceStart: 9,
+                        sourceEnd: 13
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_ARGUMENT,
+                        subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
+                        token: '',
+                        row: 1,
+                        start: 13,
+                        end: 14,
+                        sourceStart: 13,
+                        sourceEnd: 14
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '2',
+                        row: 1,
+                        start: 15,
+                        end: 16,
+                        sourceStart: 15,
+                        sourceEnd: 16
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_STOP,
+                        token: '',
+                        row: 1,
+                        start: 16,
+                        end: 17,
+                        sourceStart: 16,
+                        sourceEnd: 17
+                    }
+                ];
+                validTokenReulst(tokenList, assertResult);
+            });
             it('Round(-1, -5%)', function() {
                 const tokenList = formulaParser.setFormula('Round(-1, -5%)');
                 const assertResult = [

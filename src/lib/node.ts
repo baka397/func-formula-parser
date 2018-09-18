@@ -23,8 +23,9 @@ export function parseNode(tokenList: ITokenItem[]): INodeItem {
     }; // 节点列表结果
     let lastRootNodeItem: INodeItem = nodeItemTree;
     let curNodeIndex: number[] = []; // 节点索引
+    let lastToken: ITokenItem = tokenList[0];
     tokenList.slice(1).forEach((token, index) => {
-        const nodeItemResult = parseItemNode(token, lastRootNodeItem, curNodeIndex, nodeItemTree);
+        const nodeItemResult = parseItemNode(token, lastToken, lastRootNodeItem, curNodeIndex, nodeItemTree);
         // 查询是否有节点列表
         if (Array.isArray(nodeItemResult)) {
             lastRootNodeItem = nodeItemResult[0];
@@ -36,6 +37,7 @@ export function parseNode(tokenList: ITokenItem[]): INodeItem {
         } else {
             lastRootNodeItem = nodeItemResult;
         }
+        lastToken = token;
     });
     return nodeItemTree;
 }
@@ -43,12 +45,13 @@ export function parseNode(tokenList: ITokenItem[]): INodeItem {
 /**
  * 解析单个节点
  * @param  {ITokenItem} token            当前令牌
+ * @param  {ITokenItem} lastToken        上个令牌
  * @param  {INodeItem}  lastRootNodeItem 最后一个根节点
  * @param  {number[]}   nodeIndex        节点索引
  * @param  {INodeItem}  nodeItemTree     节点树
  * @return {INodeItem}                   当前根节点,如果有额外参数,则第二个参数为新的节点索引
  */
-function parseItemNode(token: ITokenItem, lastRootNodeItem: INodeItem, nodeIndex: number[], nodeItemTree: INodeItem): INodeItem | [INodeItem, number[]] {
+function parseItemNode(token: ITokenItem, lastToken: ITokenItem, lastRootNodeItem: INodeItem, nodeIndex: number[], nodeItemTree: INodeItem): INodeItem | [INodeItem, number[]] {
     const nodeItem: INodeItem = {
         children: [],
         token
@@ -69,9 +72,9 @@ function parseItemNode(token: ITokenItem, lastRootNodeItem: INodeItem, nodeIndex
                 insetNodeItem(nodeItem, lastRootNodeItem, nodeIndex);
                 return nodeItem;
             }
-            // 如果上一个为起始,则直接返回
+            // 如果上一个为起始,则直接返回前一个根节点
             const prevNodeItem = getNodeItemWithIndex(nodeItemTree, nodeIndex);
-            if (prevNodeItem.token.subType === TokenSubType.SUBTYPE_START && prevNodeItem.token.type === token.type) {
+            if (lastToken.subType === TokenSubType.SUBTYPE_START && lastToken.type === token.type) {
                 return prevNodeItem;
             }
             return rollbackNodeItem(nodeItemTree, nodeIndex, (validNodeItem) => {
