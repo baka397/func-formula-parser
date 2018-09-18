@@ -153,8 +153,14 @@ function parseFormulaStr(formula: string, typeList: ExpectType[]): ITokenItem {
         switch (curType) {
             case TokenType.TYPE_OPERAND: // 操作对象
                 tokenItem = numberTokenMatch(formula, curType);
+                const varTokenItem: ITokenItem = variableTokenMatch(formula, curType);
                 if (!tokenItem) {
-                    tokenItem = variableTokenMatch(formula, curType);
+                    tokenItem = varTokenItem;
+                } else {
+                    // 如果数字类变量和字符串类变量不一致,则使用字符串变量
+                    if (tokenItem.sourceToken.length < varTokenItem.sourceToken.length) {
+                        tokenItem = varTokenItem;
+                    }
                 }
                 break;
             case TokenType.TYPE_FUNCTION: // 函数

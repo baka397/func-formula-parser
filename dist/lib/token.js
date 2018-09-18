@@ -143,8 +143,15 @@ function parseFormulaStr(formula, typeList) {
         switch (curType) {
             case token_1.TokenType.TYPE_OPERAND: // 操作对象
                 tokenItem = numberTokenMatch(formula, curType);
+                var varTokenItem = variableTokenMatch(formula, curType);
                 if (!tokenItem) {
-                    tokenItem = variableTokenMatch(formula, curType);
+                    tokenItem = varTokenItem;
+                }
+                else {
+                    // 如果数字类变量和字符串类变量不一致,则使用字符串变量
+                    if (tokenItem.sourceToken.length < varTokenItem.sourceToken.length) {
+                        tokenItem = varTokenItem;
+                    }
                 }
                 break;
             case token_1.TokenType.TYPE_FUNCTION: // 函数
