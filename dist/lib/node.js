@@ -18,8 +18,9 @@ function parseNode(tokenList) {
     }; // 节点列表结果
     var lastRootNodeItem = nodeItemTree;
     var curNodeIndex = []; // 节点索引
+    var lastToken = tokenList[0];
     tokenList.slice(1).forEach(function (token, index) {
-        var nodeItemResult = parseItemNode(token, lastRootNodeItem, curNodeIndex, nodeItemTree);
+        var nodeItemResult = parseItemNode(token, lastToken, lastRootNodeItem, curNodeIndex, nodeItemTree);
         // 查询是否有节点列表
         if (Array.isArray(nodeItemResult)) {
             lastRootNodeItem = nodeItemResult[0];
@@ -32,6 +33,7 @@ function parseNode(tokenList) {
         else {
             lastRootNodeItem = nodeItemResult;
         }
+        lastToken = token;
     });
     return nodeItemTree;
 }
@@ -39,12 +41,13 @@ exports.parseNode = parseNode;
 /**
  * 解析单个节点
  * @param  {ITokenItem} token            当前令牌
+ * @param  {ITokenItem} lastToken        上个令牌
  * @param  {INodeItem}  lastRootNodeItem 最后一个根节点
  * @param  {number[]}   nodeIndex        节点索引
  * @param  {INodeItem}  nodeItemTree     节点树
  * @return {INodeItem}                   当前根节点,如果有额外参数,则第二个参数为新的节点索引
  */
-function parseItemNode(token, lastRootNodeItem, nodeIndex, nodeItemTree) {
+function parseItemNode(token, lastToken, lastRootNodeItem, nodeIndex, nodeItemTree) {
     var nodeItem = {
         children: [],
         token: token
@@ -65,9 +68,9 @@ function parseItemNode(token, lastRootNodeItem, nodeIndex, nodeItemTree) {
                 insetNodeItem(nodeItem, lastRootNodeItem, nodeIndex);
                 return nodeItem;
             }
-            // 如果上一个为起始,则直接返回
+            // 如果上一个为起始,则直接返回前一个根节点
             var prevNodeItem = getNodeItemWithIndex(nodeItemTree, nodeIndex);
-            if (prevNodeItem.token.subType === token_1.TokenSubType.SUBTYPE_START && prevNodeItem.token.type === token.type) {
+            if (lastToken.subType === token_1.TokenSubType.SUBTYPE_START && lastToken.type === token.type) {
                 return prevNodeItem;
             }
             return rollbackNodeItem(nodeItemTree, nodeIndex, function (validNodeItem) {
