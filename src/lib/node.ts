@@ -1,11 +1,7 @@
-import {IFormulaOption} from '../interfaces/common';
-import {INodeItem} from '../interfaces/node';
-import {ITokenItem} from '../interfaces/token';
-
-import {ExpectType} from '../types/common';
-import {TokenSubType, TokenType} from '../types/token';
-
-import {getMathOperatorPriority} from './common';
+import { INodeItem } from '../interfaces/node';
+import { ITokenItem } from '../interfaces/token';
+import { TokenSubType, TokenType } from '../types/token';
+import { getMathOperatorPriority } from './common';
 
 /**
  * 解析令牌节点
@@ -13,7 +9,7 @@ import {getMathOperatorPriority} from './common';
  * @param  {IFormulaOption} option    选项
  * @return {INodeItem[]}              语法节点列表
  */
-export function parseNode(tokenList: ITokenItem[]): INodeItem {
+export function parseNode(tokenList: ITokenItem[]): INodeItem | null {
     if (tokenList.length === 0) {
         return null;
     }
@@ -24,7 +20,7 @@ export function parseNode(tokenList: ITokenItem[]): INodeItem {
     let lastRootNodeItem: INodeItem = nodeItemTree;
     let curNodeIndex: number[] = []; // 节点索引
     let lastToken: ITokenItem = tokenList[0];
-    tokenList.slice(1).forEach((token, index) => {
+    tokenList.slice(1).forEach((token) => {
         const nodeItemResult = parseItemNode(token, lastToken, lastRootNodeItem, curNodeIndex, nodeItemTree);
         // 查询是否有节点列表
         if (Array.isArray(nodeItemResult)) {
@@ -88,7 +84,9 @@ function parseItemNode(token: ITokenItem, lastToken: ITokenItem, lastRootNodeIte
         //     2.2 否则,在当前级查找变换,不回滚
         case TokenType.TYPE_OP_IN:
         case TokenType.TYPE_OP_POST:
-            const checkIndex = [].concat(nodeIndex);
+            const checkIndex = nodeIndex.map((item) => {
+                return item;
+            });
             if (checkIndex.length > 0) {
                 const tokenOperatorPriority = getMathOperatorPriority(token);
                 const rollbackItem = rollbackNodeItem(nodeItemTree, checkIndex, (validNodeItem) => {
@@ -118,6 +116,7 @@ function parseItemNode(token: ITokenItem, lastToken: ITokenItem, lastRootNodeIte
             });
         }
     }
+    return nodeItemTree;
 }
 
 // 通过节点索引获取节点

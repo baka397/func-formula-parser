@@ -1,3 +1,3 @@
 import {TokenSubType, TokenType} from './token';
 
-export type ExpectType = [TokenType, TokenSubType];
+export type ExpectType = [TokenType, TokenSubType | null];

@@ -1,24 +1,27 @@
 {
     "compilerOptions": {
+        "strict": true,
+        "baseUrl": "./",
         "module": "commonjs",
-        "esModuleInterop": true,
         "target": "es5",
-        "noImplicitAny": true,
+        "noImplicitAny": false,
+        "declaration": true,
+        "allowJs": false,
         "moduleResolution": "node",
         "sourceMap": false,
-        "outDir": "dist",
-        "baseUrl": ".",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "paths": {
             "*": [
                 "node_modules/*",
-                "src/types/*"
+                "types/*"
             ]
         }
     },
-    "include": [
-        "src/**/*.ts"
-    ],
+    "include": ["*.ts", "**/*.ts"],
     "exclude": [
-        "src/*.d.ts"
+        "node_modules"
     ]
 }

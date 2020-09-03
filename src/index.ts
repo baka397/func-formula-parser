@@ -10,9 +10,9 @@ import {parseToken} from './lib/token';
  */
 class FuncFormulaParser {
     private option: IFormulaOption; // 解析器选项
-    private sourceFormula: string; // 原始公式
+    private sourceFormula: string = ''; // 原始公式
     private tokenArr: ITokenItem[] = []; // 词法分析结果
-    private nodeTree: INodeItem = null; // 语法分析结果
+    private nodeTree: INodeItem | null = null; // 语法分析结果
     constructor(customOpt: IFormulaOption = {}) {
         this.option = {
             autoParseNode: false,
@@ -42,7 +42,7 @@ class FuncFormulaParser {
      * 编译当前令牌的语法节点
      * @return {INodeItem} 语法节点树
      */
-    public parseNode(): INodeItem {
+    public parseNode(): INodeItem | null {
         if (this.nodeTree) {
             return this.nodeTree;
         }
@@ -60,7 +60,7 @@ class FuncFormulaParser {
      * 获取已经编译后的语法节点
      * @return {INodeItem} 语法节点树
      */
-    public getNodeTree(): INodeItem {
+    public getNodeTree(): INodeItem | null {
         return this.nodeTree;
     }
 }

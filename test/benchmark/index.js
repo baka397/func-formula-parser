@@ -4,7 +4,7 @@ const Benchmark = require('benchmark');
 
 const chalk = require('chalk');
 
-const FuncFormulaParser = require('../../dist/').default;
+const FuncFormulaParser = require('../../src/').default;
 const excelFormulaP = require('../third_lib/excel_formula_p');
 const simpleFormula = '1+1';
 const complexFormula = 'count(a) + IF(CONTAINS({3, 4, 5}), POW(2,b), ROUND(a*2.3))';

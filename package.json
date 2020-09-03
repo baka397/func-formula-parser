@@ -1,17 +1,31 @@
 {
   "name": "func-formula-parser",
-  "version": "0.1.8",
+  "version": "1.0.0",
   "description": "a AST parser for formula & formula function",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "types": "src/index.d.ts",
   "scripts": {
-    "commit": "npm run build && npm run cover-test && npm run benchmark",
-    "unit-test": "node ./node_modules/mocha/bin/mocha",
-    "cover-test": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
-    "build": "npm run lint && tsc",
-    "lint": "tslint -c tslint.json -p tsconfig.json && eslint test/",
-    "benchmark": "node test/benchmark/",
-    "declaration": "tsc --declaration src/index.ts && git clean -f src/*.js && git clean -f src/*/*.d.ts"
+    "prepublishOnly": "npm run test && npm run build",
+    "build": "npm run clean && npm run lint && tsc",
+    "commit": "npm run test",
+    "test": "npm run lint && npm run test:cover",
+    "test:unit": "npm run build && mocha ./test/*.test.js --require intelli-espower-loader",
+    "test:cover": "nyc npm run test:unit --include-pid",
+    "test:benchmark": "npm run build && node test/benchmark/",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "clean": "git clean -Xfq"
+  },
+  "nyc": {
+    "include": [
+      "**/*.js"
+    ],
+    "exclude": [
+      "test/**/*.js"
+    ],
+    "reporter": [
+      "text-summary",
+      "lcov"
+    ]
   },
   "pre-commit": [
     "commit"
@@ -31,15 +45,15 @@
   },
   "homepage": "https://github.com/baka397/func-formula-parser#readme",
   "engines": {
-    "node": ">=4"
+    "node": ">=8"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
     "chalk": "^2.4.1",
     "eslint": "^5.2.0",
     "intelli-espower-loader": "^1.0.1",
-    "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
+    "nyc": "^15.1.0",
     "power-assert": "^1.6.0",
     "pre-commit": "^1.2.2",
     "tslint": "^5.11.0",

@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('power-assert');
-const FuncFormulaParser = require('../../dist/').default;
+const FuncFormulaParser = require('../../src/').default;
 const formulaParser = new FuncFormulaParser({
     autoParseNode: true
 });
