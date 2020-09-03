@@ -9,7 +9,7 @@ a AST parser for formula &amp; formula function
 [travis-url]: https://travis-ci.org/baka397/func-formula-parser
 [codecov-image]: https://img.shields.io/codecov/c/github/baka397/func-formula-parser/master.svg?style=flat-square
 [codecov-url]: https://codecov.io/github/baka397/func-formula-parser?branch=master
-[node-image]: https://img.shields.io/badge/node.js-%3E=_4-green.svg?style=flat-square
+[node-image]: https://img.shields.io/badge/node.js-%3E=_8-green.svg?style=flat-square
 [node-url]: http://nodejs.org/download/
 
 ## 关于 About
@@ -90,11 +90,11 @@ npm run build
 
 ## 测试 Test
 ```
-npm run unit-test
-npm run cover-test
+npm run test:unit
+npm run test
 ```
 
 ## 基准测试 Benchmarks
 ```
-npm run benchmark
+npm run test:benchmark
 ```
