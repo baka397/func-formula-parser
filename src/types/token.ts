@@ -3,14 +3,14 @@ export enum TokenType {
     TYPE_START = 'start', // 公式起始符
     TYPE_OPERAND = 'operand', // 操作对象
     TYPE_FUNCTION = 'function', // 函数
-    TYPE_SUBEXPR = 'subexpression', // 子表达式
+    TYPE_SUBEXPR = 'subExpression', // 子表达式
     TYPE_OP_PRE = 'operator-prefix', // 前置操作符
     TYPE_OP_IN = 'operator-infix', // 居中操作符
     TYPE_OP_POST = 'operator-postfix', // 后置表达式
     TYPE_ARGUMENT = 'argument', // 参数
     TYPE_SET = 'set', // 集合
     TYPE_SPACE = 'space', // 空格
-    TOK_TYPE_UNKNOWN = 'unknow' // 未知类型
+    TOK_TYPE_UNKNOWN = 'unknown' // 未知类型
 }
 
 // 令牌子类型
@@ -23,7 +23,7 @@ export enum TokenSubType {
     SUBTYPE_ERROR = 'error', // 错误类型
     SUBTYPE_MATH = 'math', // 数学计算符号
     SUBTYPE_EMPTY = '', // 空类型
-    SUBTYPE_UNKNOWN = 'unknow' // 未知类型
+    SUBTYPE_UNKNOWN = 'unknown' // 未知类型
 }
 
 // 子令牌类型值

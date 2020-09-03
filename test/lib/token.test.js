@@ -1,8 +1,8 @@
 'use strict';
 const assert = require('power-assert');
-const FuncFormulaParser = require('../../dist/').default;
+const FuncFormulaParser = require('../../src/').default;
 const formulaParser = new FuncFormulaParser({});
-const TOKEN = require('../../dist/types/token');
+const TOKEN = require('../../src/types/token');
 
 function validTokenReulst(tokenList, assertResult) {
     assert(tokenList.length === assertResult.length);

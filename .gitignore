@@ -1,10 +1,27 @@
-# files
-.git
-*.log
-*.zip
-
-# folders
+# dependencies
 node_modules/
-logs/
-coverage/
-*.log
+
+# IDE
+/.idea
+/.awcache
+/.vscode
+
+# bundle
+/**/*.d.ts
+/**/*.js
+
+# test
+!/test/**/*.js
+
+# types
+!/types/**/*.d.ts
+
+# misc
+.DS_Store
+npm-debug.log
+yarn-error.log
+/**/npm-debug.log
+
+# tests
+/coverage
+/.nyc_output

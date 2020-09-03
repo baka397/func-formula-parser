@@ -54,10 +54,9 @@ function throwSyntaxError(line: number, col: number, formulaStr: string, desc: s
 // 单行解析令牌
 function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenItem, lastParentTokenTypeList: TokenType[]): ITokenItem[] {
     const curLineTokenList: ITokenItem[] = []; // 当前数据
-    const curLastTokenType: TokenType = lastParentTokenTypeList[0] || null;
     let curTokenItem: ITokenItem = lastTokenItem; // 当前令牌
     let curStart: number = 0; // 当前起始点
-    let sourceStart: number = lastTokenItem.loc.sourceEnd; // 当前起始点
+    let sourceStart: number = lastTokenItem.loc ? lastTokenItem.loc.sourceEnd : 0; // 当前起始点
     let sourceEnd: number = sourceStart; // 当前结束点
     // 如果没有节点,则直接返回
     if (formulaStr.length === 0) {
@@ -71,6 +70,8 @@ function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenI
             throwSyntaxError(line, curStart, formulaStr, `${curTokenItem.type} expect: ${tokenObj.expectTypeList.map((item) => {
                 return `${item[0]}${item[1] ? ':' + item[1] : ''}`;
             }).join(',')}`);
+            // @ts-ignore 这里忽略抛出错误
+            return;
         }
         formulaStr = formulaStr.substring(tokenItem.sourceToken.length);
         // 如果是空格时,跳过,并记录节点
@@ -97,7 +98,7 @@ function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenI
         // 插入当前令牌
         tokenItem.parentType = lastParentTokenTypeList[0] || null;
         // 检测是否需要插入一个新的上级令牌
-        const curParentTokenType = getParentTokenTypeName(tokenItem, curLineTokenList);
+        const curParentTokenType = getParentTokenTypeName(tokenItem);
         // 如果有父级类型插入
         if (curParentTokenType) {
             lastParentTokenTypeList.unshift(curParentTokenType);
@@ -119,13 +120,14 @@ function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenI
  */
 function parseType(formula: string, prevTokenItem: ITokenItem): {
     expectTypeList: ExpectType[],
-    item: ITokenItem
+    item?: ITokenItem
 } {
     const expectTypeList: ExpectType[] = getExpectTypeByToken(prevTokenItem);
     const tokenItem = parseFormulaStr(formula, expectTypeList);
     // 如果是结束符时,设置当前类型为父类型
     if (tokenItem && tokenItem.subType === TokenSubType.SUBTYPE_STOP) {
         // 检测前一个类型是否为闭合直接设置父类型或
+        // @ts-ignore
         tokenItem.type = isParentToken(prevTokenItem) ? prevTokenItem.type : prevTokenItem.parentType;
     }
     return {
@@ -140,25 +142,25 @@ function parseType(formula: string, prevTokenItem: ITokenItem): {
  * @param  {TokenType[]} typeList 字符串列表
  * @return {ITokenItem}           令牌对象
  */
-function parseFormulaStr(formula: string, typeList: ExpectType[]): ITokenItem {
-    let tokenItem: ITokenItem;
+function parseFormulaStr(formula: string, typeList: ExpectType[]): ITokenItem | undefined {
+    let tokenItem: ITokenItem | undefined;
     // 检查空格
     tokenItem = spaceTokenMatch(formula, TokenType.TYPE_SPACE);
     if (tokenItem) {
         return tokenItem;
     }
-    const result = typeList.some((type) => {
+    typeList.some((type) => {
         const curType: TokenType = type[0];
-        const curExpectSubType: TokenSubType = type[1];
+        const curExpectSubType: TokenSubType | null = type[1];
         switch (curType) {
             case TokenType.TYPE_OPERAND: // 操作对象
                 tokenItem = numberTokenMatch(formula, curType);
-                const varTokenItem: ITokenItem = variableTokenMatch(formula, curType);
+                const varTokenItem: ITokenItem | undefined = variableTokenMatch(formula, curType);
                 if (!tokenItem) {
                     tokenItem = varTokenItem;
                 } else {
                     // 如果数字类变量和字符串类变量不一致,则使用字符串变量
-                    if (tokenItem.sourceToken.length < varTokenItem.sourceToken.length) {
+                    if (varTokenItem && tokenItem.sourceToken.length < varTokenItem.sourceToken.length) {
                         tokenItem = varTokenItem;
                     }
                 }
@@ -167,7 +169,7 @@ function parseFormulaStr(formula: string, typeList: ExpectType[]): ITokenItem {
                 tokenItem = functionTokenMatch(formula, curType);
                 break;
             case TokenType.TYPE_SUBEXPR: // 子表达式
-                tokenItem = subexpressionTokenMatch(formula, curType, curExpectSubType);
+                tokenItem = subExpressionTokenMatch(formula, curType, curExpectSubType);
                 break;
             case TokenType.TYPE_OP_PRE: // 前置操作符
                 tokenItem = mathTokenMatch(formula, curType);
@@ -197,7 +199,7 @@ function parseFormulaStr(formula: string, typeList: ExpectType[]): ITokenItem {
 }
 
 // 获取父级令牌名称
-function getParentTokenTypeName(tokenItem: ITokenItem, tokenList: ITokenItem[]): TokenType {
+function getParentTokenTypeName(tokenItem: ITokenItem): TokenType | null {
     const curTokenType = tokenItem.type;
     switch (curTokenType) {
         // 以下类型会返回自身为父级令牌
@@ -248,7 +250,7 @@ function isParentToken(tokenItem: ITokenItem): boolean {
  */
 
 // 匹配数字令牌
-function spaceTokenMatch(formula: string, type: TokenType): ITokenItem {
+function spaceTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
     const spaceMatch = formula.match(TokenSubTypeExpReg.SPACE);
     if (spaceMatch) {
         return {
@@ -261,7 +263,7 @@ function spaceTokenMatch(formula: string, type: TokenType): ITokenItem {
 }
 
 // 匹配数字令牌
-function numberTokenMatch(formula: string, type: TokenType): ITokenItem {
+function numberTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
     const numberMatch = formula.match(TokenSubTypeExpReg.NUMBER);
     if (numberMatch) {
         return {
@@ -274,7 +276,7 @@ function numberTokenMatch(formula: string, type: TokenType): ITokenItem {
 }
 
 // 匹配函数令牌
-function functionTokenMatch(formula: string, type: TokenType): ITokenItem {
+function functionTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
     const variableMatch = formula.match(TokenSubTypeExpReg.FUNCTION);
     if (variableMatch) {
         return {
@@ -287,7 +289,7 @@ function functionTokenMatch(formula: string, type: TokenType): ITokenItem {
 }
 
 // 匹配变量令牌
-function variableTokenMatch(formula: string, type: TokenType): ITokenItem {
+function variableTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
     const variableMatch = formula.match(TokenSubTypeExpReg.VARIABLE);
     if (variableMatch) {
         return {
@@ -300,10 +302,10 @@ function variableTokenMatch(formula: string, type: TokenType): ITokenItem {
 }
 
 // 匹配子表达式令牌
-function subexpressionTokenMatch(formula: string, type: TokenType, expectSubType?: TokenSubType): ITokenItem {
+function subExpressionTokenMatch(formula: string, type: TokenType, expectSubType: TokenSubType | null): ITokenItem | undefined {
     if (formula[0] === '(') {
         if (expectSubType && expectSubType !== TokenSubType.SUBTYPE_START) {
-            return null;
+            return;
         }
         return {
             sourceToken: '(',
@@ -314,7 +316,7 @@ function subexpressionTokenMatch(formula: string, type: TokenType, expectSubType
     }
     if (formula[0] === ')') {
         if (expectSubType && expectSubType !== TokenSubType.SUBTYPE_STOP) {
-            return null;
+            return;
         }
         return {
             sourceToken: ')',
@@ -326,8 +328,8 @@ function subexpressionTokenMatch(formula: string, type: TokenType, expectSubType
 }
 
 // 匹配数学令牌
-function mathTokenMatch(formula: string, type: TokenType): ITokenItem {
-    let matchExpReg: RegExp;
+function mathTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
+    let matchExpReg: RegExp | undefined;
     switch (type) {
         case TokenType.TYPE_OP_PRE:
             matchExpReg = TokenSubTypeExpReg.PRE_MATH;
@@ -338,6 +340,8 @@ function mathTokenMatch(formula: string, type: TokenType): ITokenItem {
         case TokenType.TYPE_OP_POST:
             matchExpReg = TokenSubTypeExpReg.POST_MATH;
             break;
+        default:
+            return;
     }
     const mathMatch = formula.match(matchExpReg);
     if (mathMatch) {
@@ -351,7 +355,7 @@ function mathTokenMatch(formula: string, type: TokenType): ITokenItem {
 }
 
 // 匹配逻辑令牌
-function logicalTokenMatch(formula: string, type: TokenType): ITokenItem {
+function logicalTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
     const logicalMatch = formula.match(TokenSubTypeExpReg.LOGICAL);
     if (logicalMatch) {
         return {
@@ -364,7 +368,7 @@ function logicalTokenMatch(formula: string, type: TokenType): ITokenItem {
 }
 
 // 匹配操作符
-function argumentTokenMatch(formula: string, type: TokenType): ITokenItem {
+function argumentTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
     if (formula[0] === ',') {
         return {
             sourceToken: ',',
@@ -376,10 +380,10 @@ function argumentTokenMatch(formula: string, type: TokenType): ITokenItem {
 }
 
 // 匹配集合令牌
-function setTokenMatch(formula: string, type: TokenType, expectSubType?: TokenSubType): ITokenItem {
+function setTokenMatch(formula: string, type: TokenType, expectSubType: TokenSubType | null): ITokenItem | undefined {
     if (formula[0] === '{') {
         if (expectSubType && expectSubType !== TokenSubType.SUBTYPE_START) {
-            return null;
+            return;
         }
         return {
             sourceToken: '{',
@@ -390,7 +394,7 @@ function setTokenMatch(formula: string, type: TokenType, expectSubType?: TokenSu
     }
     if (formula[0] === '}') {
         if (expectSubType && expectSubType !== TokenSubType.SUBTYPE_STOP) {
-            return null;
+            return;
         }
         return {
             sourceToken: '}',

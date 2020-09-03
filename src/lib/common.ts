@@ -6,7 +6,7 @@ import {TokenSubType, TokenType} from '../types/token';
 // 根据前一次token数据获取期望的token类型
 export function getExpectTypeByToken(prevTokenItem: ITokenItem): ExpectType[] {
     let expectTypeList: ExpectType[] = [];
-    const curParentType: TokenType = prevTokenItem.parentType;
+    const curParentType: TokenType | undefined = prevTokenItem.parentType;
     const curSubType: TokenSubType = prevTokenItem.subType;
     const curType: TokenType = prevTokenItem.type;
     // 对嵌入型参数插入通用类型
