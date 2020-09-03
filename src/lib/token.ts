@@ -93,6 +93,7 @@ function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenI
         // 检测是否需要回滚到上级父令牌
         const isNeedRollback = isNeedRollbackParentToken(tokenItem);
         if (isNeedRollback) {
+            tokenItem.type = lastParentTokenTypeList[0];
             lastParentTokenTypeList.shift();
         }
         // 插入当前令牌
@@ -124,12 +125,6 @@ function parseType(formula: string, prevTokenItem: ITokenItem): {
 } {
     const expectTypeList: ExpectType[] = getExpectTypeByToken(prevTokenItem);
     const tokenItem = parseFormulaStr(formula, expectTypeList);
-    // 如果是结束符时,设置当前类型为父类型
-    if (tokenItem && tokenItem.subType === TokenSubType.SUBTYPE_STOP) {
-        // 检测前一个类型是否为闭合直接设置父类型或
-        // @ts-ignore
-        tokenItem.type = isParentToken(prevTokenItem) ? prevTokenItem.type : prevTokenItem.parentType;
-    }
     return {
         expectTypeList,
         item: tokenItem
@@ -229,17 +224,6 @@ function isClosedToken(tokenItem: ITokenItem): boolean {
         case TokenType.TYPE_FUNCTION:
         case TokenType.TYPE_SUBEXPR:
         case TokenType.TYPE_OP_POST:
-            return true;
-    }
-    return false;
-}
-
-// 是否为父级元素
-function isParentToken(tokenItem: ITokenItem): boolean {
-    switch (tokenItem.type) {
-        // 以下类型需要特殊判断
-        case TokenType.TYPE_FUNCTION:
-        case TokenType.TYPE_SUBEXPR:
             return true;
     }
     return false;
