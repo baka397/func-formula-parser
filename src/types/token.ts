@@ -10,6 +10,7 @@ export enum TokenType {
     TYPE_ARGUMENT = 'argument', // 参数
     TYPE_SET = 'set', // 集合
     TYPE_SPACE = 'space', // 空格
+    TYPE_COMMENT = 'comment', // 注释
     TOK_TYPE_UNKNOWN = 'unknown' // 未知类型
 }
 
@@ -19,6 +20,7 @@ export enum TokenSubType {
     SUBTYPE_STOP = 'stop', // 子类型结束符
     SUBTYPE_VARIABLE = 'variable', // 子类型变量
     SUBTYPE_NUMBER = 'number', // 数字类型
+    SUBTYPE_STRING = 'string', // 字符串
     SUBTYPE_LOGICAL = 'logical', // 逻辑类型
     SUBTYPE_ERROR = 'error', // 错误类型
     SUBTYPE_MATH = 'math', // 数学计算符号
@@ -28,6 +30,7 @@ export enum TokenSubType {
 
 // 子令牌类型值
 export const TokenSubTypeExpReg = {
+    COMMENT: /^(\/\/[^$\n]+|\/\*[^\/]+\*\/)/,
     FUNCTION: /^([a-zA-Z_]+)\(/,
     LOGICAL: /^(>=|<=|<|>|=)/,
     MATH: /^[+\-*/^]/,
@@ -35,5 +38,6 @@ export const TokenSubTypeExpReg = {
     POST_MATH: /^[%]/,
     PRE_MATH: /^[-]/,
     SPACE: /^\s+/,
+    STRING: /^(\'[^\']+\'|\"[^\"]+\")/,
     VARIABLE: /^[a-zA-Z_0-9\u4e00-\u9fa5\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b]+(?!\()/
 };
