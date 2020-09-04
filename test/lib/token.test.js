@@ -4,7 +4,7 @@ const FuncFormulaParser = require('../../src/').default;
 const formulaParser = new FuncFormulaParser({});
 const TOKEN = require('../../src/types/token');
 
-function validTokenReulst(tokenList, assertResult) {
+function validTokenRuleList(tokenList, assertResult) {
     assert(tokenList.length === assertResult.length);
     tokenList.forEach(function(item, index) {
         assert(item.parentType === assertResult[index].parentType);
@@ -53,13 +53,13 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
                         token: '1',
                         row: 1,
-                        start: 3,
-                        end: 4,
+                        start: 2,
+                        end: 3,
                         sourceStart: 3,
                         sourceEnd: 4
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
                 assert(tokenList === formulaParser.getTokens());
             });
         });
@@ -101,7 +101,7 @@ module.exports = function() {
                         sourceEnd: 3
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('same formula 1+1', function() {
                 const tokenList = formulaParser.setFormula('1+1');
@@ -140,7 +140,7 @@ module.exports = function() {
                         sourceEnd: 3
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('1+1.2', function() {
                 const tokenList = formulaParser.setFormula('1+1.2');
@@ -179,7 +179,7 @@ module.exports = function() {
                         sourceEnd: 5
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('1*-1.2', function() {
                 const tokenList = formulaParser.setFormula('1*-1.2');
@@ -229,7 +229,7 @@ module.exports = function() {
                         sourceEnd: 6
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('1+1.2e24', function() {
                 const tokenList = formulaParser.setFormula('1+1.2e24');
@@ -268,7 +268,7 @@ module.exports = function() {
                         sourceEnd: 8
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('(10+2)*3/5%', function() {
                 const tokenList = formulaParser.setFormula('(10+2)*3/5%');
@@ -384,7 +384,7 @@ module.exports = function() {
                         sourceEnd: 11
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
         });
         describe('Function', function() {
@@ -414,7 +414,68 @@ module.exports = function() {
                         sourceEnd: 7
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
+            });
+            it('RunString("test")+10', function() {
+                const tokenList = formulaParser.setFormula('RunString("test")+10');
+                const assertResult = [
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_START,
+                        token: 'RunString',
+                        row: 1,
+                        start: 0,
+                        end: 10,
+                        sourceStart: 0,
+                        sourceEnd: 10
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_STRING,
+                        token: 'test',
+                        row: 1,
+                        start: 10,
+                        end: 16,
+                        sourceStart: 10,
+                        sourceEnd: 16
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_STOP,
+                        token: '',
+                        row: 1,
+                        start: 16,
+                        end: 17,
+                        sourceStart: 16,
+                        sourceEnd: 17
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OP_IN,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '+',
+                        row: 1,
+                        start: 17,
+                        end: 18,
+                        sourceStart: 17,
+                        sourceEnd: 18
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '10',
+                        row: 1,
+                        start: 18,
+                        end: 20,
+                        sourceStart: 18,
+                        sourceEnd: 20
+                    }
+                ];
+                validTokenRuleList(tokenList, assertResult);
             });
             it('Variable(1a测试, 2)', function() {
                 const tokenList = formulaParser.setFormula('Variable(1a测试, 2)');
@@ -458,8 +519,8 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
                         token: '2',
                         row: 1,
-                        start: 15,
-                        end: 16,
+                        start: 14,
+                        end: 15,
                         sourceStart: 15,
                         sourceEnd: 16
                     },
@@ -469,13 +530,13 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_STOP,
                         token: '',
                         row: 1,
-                        start: 16,
-                        end: 17,
+                        start: 15,
+                        end: 16,
                         sourceStart: 16,
                         sourceEnd: 17
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('Round(-1, -5%)', function() {
                 const tokenList = formulaParser.setFormula('Round(-1, -5%)');
@@ -530,8 +591,8 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_MATH,
                         token: '-',
                         row: 1,
-                        start: 10,
-                        end: 11,
+                        start: 9,
+                        end: 10,
                         sourceStart: 10,
                         sourceEnd: 11
                     },
@@ -541,8 +602,8 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
                         token: '5',
                         row: 1,
-                        start: 11,
-                        end: 12,
+                        start: 10,
+                        end: 11,
                         sourceStart: 11,
                         sourceEnd: 12
                     },
@@ -552,8 +613,8 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_MATH,
                         token: '%',
                         row: 1,
-                        start: 12,
-                        end: 13,
+                        start: 11,
+                        end: 12,
                         sourceStart: 12,
                         sourceEnd: 13
                     },
@@ -563,13 +624,13 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_STOP,
                         token: '',
                         row: 1,
-                        start: 13,
-                        end: 14,
+                        start: 12,
+                        end: 13,
                         sourceStart: 13,
                         sourceEnd: 14
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('IF(a>=0,count(3,4,5),5%)', function() {
                 const tokenList = formulaParser.setFormula('IF(a>=0,count(3,4,5),5%)');
@@ -751,7 +812,7 @@ module.exports = function() {
                         sourceEnd: 24
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
             it('CONTAINS({test,10,测试})', function() {
                 const tokenList = formulaParser.setFormula('CONTAINS({test,10,测试})');
@@ -856,10 +917,203 @@ module.exports = function() {
                         sourceEnd: 22
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
         });
         describe('Format function', function() {
+            it('\n--------------// test comment\n/** test inline comment */ IF(a /** in formula comment */>= 0,// test end comment\n    count(3, 4, 5),\n-5%)\n--------------\n', function() {
+                const tokenList = formulaParser.setFormula('// test comment\n/** test inline comment */ IF(a /** in formula comment */>= 0,// test end comment\n    count(3, 4, 5),\n-5%)\n');
+                const assertResult = [
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_START,
+                        token: 'IF',
+                        row: 2,
+                        start: 0,
+                        end: 3,
+                        sourceStart: 27,
+                        sourceEnd: 30
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_VARIABLE,
+                        token: 'a',
+                        row: 2,
+                        start: 3,
+                        end: 4,
+                        sourceStart: 30,
+                        sourceEnd: 31
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OP_IN,
+                        subType: TOKEN.TokenSubType.SUBTYPE_LOGICAL,
+                        token: '>=',
+                        row: 2,
+                        start: 4,
+                        end: 6,
+                        sourceStart: 57,
+                        sourceEnd: 59,
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '0',
+                        row: 2,
+                        start: 6,
+                        end: 7,
+                        sourceStart: 60,
+                        sourceEnd: 61
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_ARGUMENT,
+                        subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
+                        token: '',
+                        row: 2,
+                        start: 7,
+                        end: 8,
+                        sourceStart: 61,
+                        sourceEnd: 62
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_START,
+                        token: 'count',
+                        row: 3,
+                        start: 0,
+                        end: 6,
+                        sourceStart: 4,
+                        sourceEnd: 10
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '3',
+                        row: 3,
+                        start: 6,
+                        end: 7,
+                        sourceStart: 10,
+                        sourceEnd: 11
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_ARGUMENT,
+                        subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
+                        token: '',
+                        row: 3,
+                        start: 7,
+                        end: 8,
+                        sourceStart: 11,
+                        sourceEnd: 12
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '4',
+                        row: 3,
+                        start: 8,
+                        end: 9,
+                        sourceStart: 13,
+                        sourceEnd: 14
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_ARGUMENT,
+                        subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
+                        token: '',
+                        row: 3,
+                        start: 9,
+                        end: 10,
+                        sourceStart: 14,
+                        sourceEnd: 15
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '5',
+                        row: 3,
+                        start: 10,
+                        end: 11,
+                        sourceStart: 16,
+                        sourceEnd: 17
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_STOP,
+                        token: '',
+                        row: 3,
+                        start: 11,
+                        end: 12,
+                        sourceStart: 17,
+                        sourceEnd: 18
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_ARGUMENT,
+                        subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
+                        token: '',
+                        row: 3,
+                        start: 12,
+                        end: 13,
+                        sourceStart: 18,
+                        sourceEnd: 19
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OP_PRE,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '-',
+                        row: 4,
+                        start: 0,
+                        end: 1,
+                        sourceStart: 0,
+                        sourceEnd: 1
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OPERAND,
+                        subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
+                        token: '5',
+                        row: 4,
+                        start: 1,
+                        end: 2,
+                        sourceStart: 1,
+                        sourceEnd: 2
+                    },
+                    {
+                        parentType: TOKEN.TokenType.TYPE_FUNCTION,
+                        type: TOKEN.TokenType.TYPE_OP_POST,
+                        subType: TOKEN.TokenSubType.SUBTYPE_MATH,
+                        token: '%',
+                        row: 4,
+                        start: 2,
+                        end: 3,
+                        sourceStart: 2,
+                        sourceEnd: 3
+                    },
+                    {
+                        parentType: null,
+                        type: TOKEN.TokenType.TYPE_FUNCTION,
+                        subType: TOKEN.TokenSubType.SUBTYPE_STOP,
+                        token: '',
+                        row: 4,
+                        start: 3,
+                        end: 4,
+                        sourceStart: 3,
+                        sourceEnd: 4
+                    }
+                ];
+                validTokenRuleList(tokenList, assertResult);
+            });
             it('\n--------------\nIF(a >= 0,\n    count(3, 4, 5),\n-5%)\n--------------\n', function() {
                 const tokenList = formulaParser.setFormula('\nIF(a >= 0,\n    count(3, 4, 5),\n-5%)\n');
                 const assertResult = [
@@ -891,8 +1145,8 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_LOGICAL,
                         token: '>=',
                         row: 2,
-                        start: 5,
-                        end: 7,
+                        start: 4,
+                        end: 6,
                         sourceStart: 5,
                         sourceEnd: 7
                     },
@@ -902,8 +1156,8 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
                         token: '0',
                         row: 2,
-                        start: 8,
-                        end: 9,
+                        start: 6,
+                        end: 7,
                         sourceStart: 8,
                         sourceEnd: 9
                     },
@@ -913,8 +1167,8 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
                         token: '',
                         row: 2,
-                        start: 9,
-                        end: 10,
+                        start: 7,
+                        end: 8,
                         sourceStart: 9,
                         sourceEnd: 10
                     },
@@ -924,10 +1178,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_START,
                         token: 'count',
                         row: 3,
-                        start: 4,
-                        end: 10,
-                        sourceStart: 14,
-                        sourceEnd: 20
+                        start: 0,
+                        end: 6,
+                        sourceStart: 4,
+                        sourceEnd: 10
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -935,10 +1189,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
                         token: '3',
                         row: 3,
-                        start: 10,
-                        end: 11,
-                        sourceStart: 20,
-                        sourceEnd: 21
+                        start: 6,
+                        end: 7,
+                        sourceStart: 10,
+                        sourceEnd: 11
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -946,10 +1200,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
                         token: '',
                         row: 3,
-                        start: 11,
-                        end: 12,
-                        sourceStart: 21,
-                        sourceEnd: 22
+                        start: 7,
+                        end: 8,
+                        sourceStart: 11,
+                        sourceEnd: 12
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -957,10 +1211,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
                         token: '4',
                         row: 3,
-                        start: 13,
-                        end: 14,
-                        sourceStart: 23,
-                        sourceEnd: 24
+                        start: 8,
+                        end: 9,
+                        sourceStart: 13,
+                        sourceEnd: 14
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -968,10 +1222,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
                         token: '',
                         row: 3,
-                        start: 14,
-                        end: 15,
-                        sourceStart: 24,
-                        sourceEnd: 25
+                        start: 9,
+                        end: 10,
+                        sourceStart: 14,
+                        sourceEnd: 15
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -979,10 +1233,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_NUMBER,
                         token: '5',
                         row: 3,
-                        start: 16,
-                        end: 17,
-                        sourceStart: 26,
-                        sourceEnd: 27
+                        start: 10,
+                        end: 11,
+                        sourceStart: 16,
+                        sourceEnd: 17
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -990,10 +1244,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_STOP,
                         token: '',
                         row: 3,
-                        start: 17,
-                        end: 18,
-                        sourceStart: 27,
-                        sourceEnd: 28
+                        start: 11,
+                        end: 12,
+                        sourceStart: 17,
+                        sourceEnd: 18
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -1001,10 +1255,10 @@ module.exports = function() {
                         subType: TOKEN.TokenSubType.SUBTYPE_EMPTY,
                         token: '',
                         row: 3,
-                        start: 18,
-                        end: 19,
-                        sourceStart: 28,
-                        sourceEnd: 29
+                        start: 12,
+                        end: 13,
+                        sourceStart: 18,
+                        sourceEnd: 19
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -1014,8 +1268,8 @@ module.exports = function() {
                         row: 4,
                         start: 0,
                         end: 1,
-                        sourceStart: 29,
-                        sourceEnd: 30
+                        sourceStart: 0,
+                        sourceEnd: 1
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -1025,8 +1279,8 @@ module.exports = function() {
                         row: 4,
                         start: 1,
                         end: 2,
-                        sourceStart: 30,
-                        sourceEnd: 31
+                        sourceStart: 1,
+                        sourceEnd: 2
                     },
                     {
                         parentType: TOKEN.TokenType.TYPE_FUNCTION,
@@ -1036,8 +1290,8 @@ module.exports = function() {
                         row: 4,
                         start: 2,
                         end: 3,
-                        sourceStart: 31,
-                        sourceEnd: 32
+                        sourceStart: 2,
+                        sourceEnd: 3
                     },
                     {
                         parentType: null,
@@ -1047,11 +1301,11 @@ module.exports = function() {
                         row: 4,
                         start: 3,
                         end: 4,
-                        sourceStart: 32,
-                        sourceEnd: 33
+                        sourceStart: 3,
+                        sourceEnd: 4
                     }
                 ];
-                validTokenReulst(tokenList, assertResult);
+                validTokenRuleList(tokenList, assertResult);
             });
         });
         describe('Error Test', function() {

@@ -56,7 +56,7 @@ function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenI
     const curLineTokenList: ITokenItem[] = []; // 当前数据
     let curTokenItem: ITokenItem = lastTokenItem; // 当前令牌
     let curStart: number = 0; // 当前起始点
-    let sourceStart: number = lastTokenItem.loc ? lastTokenItem.loc.sourceEnd : 0; // 当前起始点
+    let sourceStart: number = 0; // 当前起始点
     let sourceEnd: number = sourceStart; // 当前结束点
     // 如果没有节点,则直接返回
     if (formulaStr.length === 0) {
@@ -67,19 +67,19 @@ function parseLineToken(formulaStr: string, line: number, lastTokenItem: ITokenI
         const tokenObj = parseType(formulaStr, curTokenItem);
         const tokenItem = tokenObj.item;
         if (!tokenItem) {
-            throwSyntaxError(line, curStart, formulaStr, `${curTokenItem.type} expect: ${tokenObj.expectTypeList.map((item) => {
+            throwSyntaxError(line, sourceStart, formulaStr, `${curTokenItem.type} expect: ${tokenObj.expectTypeList.map((item) => {
                 return `${item[0]}${item[1] ? ':' + item[1] : ''}`;
             }).join(',')}`);
             // @ts-ignore 这里忽略抛出错误
             return;
         }
         formulaStr = formulaStr.substring(tokenItem.sourceToken.length);
-        // 如果是空格时,跳过,并记录节点
-        if (tokenItem.type === TokenType.TYPE_SPACE) {
-            sourceStart = sourceStart + tokenItem.sourceToken.length;
-            sourceEnd = sourceEnd + tokenItem.sourceToken.length;
-            curStart = curStart + tokenItem.sourceToken.length;
-            continue;
+        switch (tokenItem.type) {
+            case TokenType.TYPE_SPACE:
+            case TokenType.TYPE_COMMENT:
+                sourceStart = sourceStart + tokenItem.sourceToken.length;
+                sourceEnd = sourceEnd + tokenItem.sourceToken.length;
+                continue;
         }
         // 更新数据
         // 更新坐标
@@ -144,18 +144,29 @@ function parseFormulaStr(formula: string, typeList: ExpectType[]): ITokenItem | 
     if (tokenItem) {
         return tokenItem;
     }
+    // 检查注释
+    tokenItem = commentTokenMatch(formula, TokenType.TYPE_COMMENT);
+    if (tokenItem) {
+        return tokenItem;
+    }
     typeList.some((type) => {
         const curType: TokenType = type[0];
         const curExpectSubType: TokenSubType | null = type[1];
         switch (curType) {
             case TokenType.TYPE_OPERAND: // 操作对象
-                tokenItem = numberTokenMatch(formula, curType);
+                tokenItem = stringTokenMatch(formula, curType, curExpectSubType);
+                // 如果有字符串操作符时,直接使用字符串
+                if (tokenItem) {
+                    return true;
+                }
+                const numTokenItem: ITokenItem | undefined = numberTokenMatch(formula, curType);
                 const varTokenItem: ITokenItem | undefined = variableTokenMatch(formula, curType);
-                if (!tokenItem) {
+                tokenItem = numTokenItem;
+                if (!numTokenItem) {
                     tokenItem = varTokenItem;
                 } else {
                     // 如果数字类变量和字符串类变量不一致,则使用字符串变量
-                    if (varTokenItem && tokenItem.sourceToken.length < varTokenItem.sourceToken.length) {
+                    if (varTokenItem && numTokenItem.sourceToken.length < varTokenItem.sourceToken.length) {
                         tokenItem = varTokenItem;
                     }
                 }
@@ -233,9 +244,22 @@ function isClosedToken(tokenItem: ITokenItem): boolean {
  * 以下为各个匹配数据类型函数
  */
 
-// 匹配数字令牌
+// 匹配空格令牌
 function spaceTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
     const spaceMatch = formula.match(TokenSubTypeExpReg.SPACE);
+    if (spaceMatch) {
+        return {
+            sourceToken: spaceMatch[0],
+            subType: TokenSubType.SUBTYPE_EMPTY,
+            token: '',
+            type
+        };
+    }
+}
+
+// 匹配注释令牌
+function commentTokenMatch(formula: string, type: TokenType): ITokenItem | undefined {
+    const spaceMatch = formula.match(TokenSubTypeExpReg.COMMENT);
     if (spaceMatch) {
         return {
             sourceToken: spaceMatch[0],
@@ -280,6 +304,22 @@ function variableTokenMatch(formula: string, type: TokenType): ITokenItem | unde
             sourceToken: variableMatch[0],
             subType: TokenSubType.SUBTYPE_VARIABLE,
             token: variableMatch[0],
+            type
+        };
+    }
+}
+
+// 匹配字符串类令牌
+function stringTokenMatch(formula: string, type: TokenType, expectSubType: TokenSubType | null): ITokenItem | undefined {
+    const variableMatch = formula.match(TokenSubTypeExpReg.STRING);
+    if (expectSubType !== TokenSubType.SUBTYPE_STRING) {
+        return;
+    }
+    if (variableMatch) {
+        return {
+            sourceToken: variableMatch[0],
+            subType: TokenSubType.SUBTYPE_STRING,
+            token: variableMatch[0].replace(/^['"]/, '').replace(/['"]$/, ''),
             type
         };
     }

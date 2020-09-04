@@ -38,10 +38,15 @@ export function getExpectTypeByToken(prevTokenItem: ITokenItem): ExpectType[] {
             ];
             break;
         case TokenType.TYPE_OPERAND:
-            expectTypeList = [
-                [TokenType.TYPE_OP_IN, null],
-                [TokenType.TYPE_OP_POST, null]
-            ];
+            switch (curSubType) {
+                case TokenSubType.SUBTYPE_STRING:
+                    break;
+                default:
+                    expectTypeList = [
+                        [TokenType.TYPE_OP_IN, null],
+                        [TokenType.TYPE_OP_POST, null]
+                    ];
+            }
             insetWrapCommonType();
             break;
         case TokenType.TYPE_FUNCTION:
@@ -52,6 +57,7 @@ export function getExpectTypeByToken(prevTokenItem: ITokenItem): ExpectType[] {
                         [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START], // 子表达式
                         [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START], // 集合起始
                         [TokenType.TYPE_FUNCTION, null],
+                        [TokenType.TYPE_OPERAND, TokenSubType.SUBTYPE_STRING],
                         [TokenType.TYPE_OPERAND, null],
                         [TokenType.TYPE_OP_PRE, null]
                     ];
@@ -109,6 +115,7 @@ export function getExpectTypeByToken(prevTokenItem: ITokenItem): ExpectType[] {
                 [TokenType.TYPE_SUBEXPR, TokenSubType.SUBTYPE_START],
                 [TokenType.TYPE_SET, TokenSubType.SUBTYPE_START],
                 [TokenType.TYPE_FUNCTION, null],
+                [TokenType.TYPE_OPERAND, TokenSubType.SUBTYPE_STRING],
                 [TokenType.TYPE_OPERAND, null]
             ];
             break;
